@@ -139,6 +139,111 @@ progression:
           material: WHEAT_SEEDS
           seconds: 120
 
+    meats:
+      display-name: "Meats"
+      color: "&c"
+      related-materials:
+        - BEEF
+        - COOKED_BEEF
+        - PORKCHOP
+        - COOKED_PORKCHOP
+        - MUTTON
+        - COOKED_MUTTON
+        - RABBIT
+        - COOKED_RABBIT
+        - CHICKEN
+        - COOKED_CHICKEN
+        - SALMON
+        - COOKED_SALMON
+        - COD
+        - COOKED_COD
+      special-info: "Killing an Enderman auto completes this section; killing mobs speeds it up."
+
+      entries:
+        raw_beef:
+          name: "Raw Beef"
+          type: ITEM
+          material: BEEF
+          seconds: 60
+
+        cooked_beef:
+          name: "Cooked Beef"
+          type: ITEM
+          material: COOKED_BEEF
+          seconds: 60
+
+        raw_porkchop:
+          name: "Raw Porkchop"
+          type: ITEM
+          material: PORKCHOP
+          seconds: 60
+
+        cooked_porkchop:
+          name: "Cooked Porkchop"
+          type: ITEM
+          material: COOKED_PORKCHOP
+          seconds: 60
+
+        raw_mutton:
+          name: "Raw Mutton"
+          type: ITEM
+          material: MUTTON
+          seconds: 60
+
+        cooked_mutton:
+          name: "Cooked Mutton"
+          type: ITEM
+          material: COOKED_MUTTON
+          seconds: 60
+
+        raw_rabbit:
+          name: "Raw Rabbit"
+          type: ITEM
+          material: RABBIT
+          seconds: 60
+
+        cooked_rabbit:
+          name: "Cooked Rabbit"
+          type: ITEM
+          material: COOKED_RABBIT
+          seconds: 60
+
+        raw_chicken:
+          name: "Raw Chicken"
+          type: ITEM
+          material: CHICKEN
+          seconds: 60
+
+        cooked_chicken:
+          name: "Cooked Chicken"
+          type: ITEM
+          material: COOKED_CHICKEN
+          seconds: 60
+
+        raw_salmon:
+          name: "Raw Salmon"
+          type: ITEM
+          material: SALMON
+          seconds: 60
+
+        cooked_salmon:
+          name: "Cooked Salmon"
+          type: ITEM
+          material: COOKED_SALMON
+          seconds: 60
+
+        raw_cod:
+          name: "Raw Cod"
+          type: ITEM
+          material: COD
+          seconds: 60
+
+        cooked_cod:
+          name: "Cooked Cod"
+          type: ITEM
+          material: COOKED_COD
+          seconds: 60
+
     stone_chainmail:
       display-name: "Stone Tools + Chainmail Armor"
       color: "&8"
@@ -201,6 +306,12 @@ progression:
           type: ITEM
           material: CHAINMAIL_CHESTPLATE
           seconds: 300
+
+        bread:
+          name: "Bread"
+          type: ITEM
+          material: BREAD
+          seconds: 60
 
         furnace:
           name: "Furnace"
