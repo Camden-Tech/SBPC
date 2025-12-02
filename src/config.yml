@@ -1,0 +1,1346 @@
+session:
+  window-day: WEDNESDAY          # DayOfWeek enum
+  start-time: "19:00"            # 7 PM
+  end-time: "22:00"              # 10 PM
+  timezone: "America/Chicago"
+
+messages:
+  server-closed-join: "&cThe server is currently closed. There is currently no active session."
+
+  item-unlocked: "&aUnlocked: &e{item}"
+  new-section-title: "&6You have reached a new section: &e{section}"
+  new-section-reset: "&7Your progress speed has been reset."
+  new-section-collect: "&7Collect related materials to speed up this section."
+  related-bonus: "&aYou have collected {material}. This section skips {seconds} seconds and speeds up by {percent}% each time!"
+  locked-section: "&cYou have not unlocked the section &e{section}&c yet. You can still collect these blocks, but you will not receive any time benefits for doing so."
+  all-sections-complete: "&aYou have completed all progression sections."
+  current-section-header: "&6Current section: &e{section}"
+  current-section-related-header: "&7Related materials:"
+  current-section-related-entry: " &8- &b{material}"
+  current-section-special: "&dSPECIAL: &f{special}"
+  current-section-no-special: "&dNo special criteria configured for this section."
+  cannot-use-item: "&cYou have not unlocked that item or its enchantments yet."
+  enchant-cancelled: "&cYou have not unlocked any of the enchantments rolled; enchantment cancelled."
+  first-steps-intro: "&aSection &e{section} &ahas begun! Chop down trees to speed up the timer's progress!"
+  section-unlock-broadcast: "&e{player} &7has unlocked the {section-colored}&7 section!"
+  bossbar-active: "&e{entry}&7 - &b{seconds}s remaining"
+  bossbar-complete: "&aAll progression unlocked!"
+
+
+progression:
+  sections:
+    first_steps:
+      display-name: "First Steps"
+      color: "&a"
+      related-materials:
+        - OAK_LOG
+        - SPRUCE_LOG
+        - BIRCH_LOG
+        - JUNGLE_LOG
+        - ACACIA_LOG
+        - DARK_OAK_LOG
+        - MANGROVE_LOG
+        - CHERRY_LOG
+        - PALE_OAK_LOG
+        - CRIMSON_STEM
+        - WARPED_STEM
+      special-info: ""
+
+      entries:
+        first_steps_wood_axe:
+          name: "Wooden Axe"
+          type: ITEM
+          material: WOODEN_AXE
+          seconds: 30
+
+    wood_leather:
+      display-name: "Wood Tools + Leather Armor"
+      color: "&6"
+      related-materials:
+        - OAK_LOG
+        - SPRUCE_LOG
+        - BIRCH_LOG
+        - JUNGLE_LOG
+        - ACACIA_LOG
+        - DARK_OAK_LOG
+        - MANGROVE_LOG
+        - CHERRY_LOG
+        - PALE_OAK_LOG
+        - CRIMSON_STEM
+        - WARPED_STEM
+        - LEATHER
+      special-info: "Having a Pale Log (even if not obtained naturally) auto completes this entire section."
+
+      entries:
+        wood_pickaxe:
+          name: "Wooden Pickaxe"
+          type: ITEM
+          material: WOODEN_PICKAXE
+          seconds: 60
+
+        wood_sword:
+          name: "Wooden Sword"
+          type: ITEM
+          material: WOODEN_SWORD
+          seconds: 60
+
+        wood_shovel:
+          name: "Wooden Shovel"
+          type: ITEM
+          material: WOODEN_SHOVEL
+          seconds: 60
+
+        wood_hoe:
+          name: "Wooden Hoe"
+          type: ITEM
+          material: WOODEN_HOE
+          seconds: 60
+
+        trail_mix:
+          name: "Trail Mix"
+          type: CUSTOM_ITEM
+          custom-key: trail_mix
+          seconds: 120
+
+        leather_helmet:
+          name: "Leather Helmet"
+          type: ITEM
+          material: LEATHER_HELMET
+          seconds: 60
+
+        leather_boots:
+          name: "Leather Boots"
+          type: ITEM
+          material: LEATHER_BOOTS
+          seconds: 60
+
+        leather_leggings:
+          name: "Leather Leggings"
+          type: ITEM
+          material: LEATHER_LEGGINGS
+          seconds: 60
+
+        leather_chestplate:
+          name: "Leather Chestplate"
+          type: ITEM
+          material: LEATHER_CHESTPLATE
+          seconds: 60
+
+    wheat_seeds:
+      display-name: "Wheat Seeds"
+      color: "&2"
+      related-materials:
+        - WHEAT_SEEDS
+      special-info: "Having Wheat (even if not obtained naturally) auto completes this section."
+
+      entries:
+        wheat_seeds:
+          name: "Wheat Seeds"
+          type: ITEM
+          material: WHEAT_SEEDS
+          seconds: 120
+
+    stone_chainmail:
+      display-name: "Stone Tools + Chainmail Armor"
+      color: "&8"
+      related-materials:
+        - COBBLESTONE
+        - COBBLED_DEEPSLATE
+      special-info: "Having a Diamond (even if not obtained naturally) auto completes this entire section."
+
+      entries:
+        stone_pickaxe:
+          name: "Stone Pickaxe"
+          type: ITEM
+          material: STONE_PICKAXE
+          seconds: 300
+
+        stone_sword:
+          name: "Stone Sword"
+          type: ITEM
+          material: STONE_SWORD
+          seconds: 300
+
+        stone_shovel:
+          name: "Stone Shovel"
+          type: ITEM
+          material: STONE_SHOVEL
+          seconds: 300
+
+        stone_hoe:
+          name: "Stone Hoe"
+          type: ITEM
+          material: STONE_HOE
+          seconds: 300
+
+        stone_axe:
+          name: "Stone Axe"
+          type: ITEM
+          material: STONE_AXE
+          seconds: 300
+
+        chain_helmet:
+          name: "Chainmail Helmet"
+          type: ITEM
+          material: CHAINMAIL_HELMET
+          seconds: 300
+
+        chain_boots:
+          name: "Chainmail Boots"
+          type: ITEM
+          material: CHAINMAIL_BOOTS
+          seconds: 300
+
+        chain_leggings:
+          name: "Chainmail Leggings"
+          type: ITEM
+          material: CHAINMAIL_LEGGINGS
+          seconds: 300
+
+        chain_chestplate:
+          name: "Chainmail Chestplate"
+          type: ITEM
+          material: CHAINMAIL_CHESTPLATE
+          seconds: 300
+
+        furnace:
+          name: "Furnace"
+          type: ITEM
+          material: FURNACE
+          seconds: 60
+
+
+    shield_bucket_fns:
+      display-name: "Shield + Bucket + Flint and Steel"
+      color: "&9"
+      related-materials:
+        - FLINT
+        - RAW_IRON
+      special-info: "Having an Obsidian (even if not obtained naturally) auto completes this entire section."
+
+      entries:
+        shield:
+          name: "Shield"
+          type: ITEM
+          material: SHIELD
+          seconds: 480
+
+        bucket:
+          name: "Bucket"
+          type: ITEM
+          material: BUCKET
+          seconds: 480
+
+        flint_and_steel:
+          name: "Flint and Steel"
+          type: ITEM
+          material: FLINT_AND_STEEL
+          seconds: 480
+
+        tracking_compass:
+          name: "Tracking Compass"
+          type: CUSTOM_ITEM
+          custom-key: tracking_compass
+          seconds: 600
+
+    armor_padding:
+      display-name: "Armor Padding"
+      color: "&f"
+      related-materials:
+        - WHITE_WOOL
+        - STRING
+      special-info: "Having a Red Bed (even if not obtained naturally) auto completes this section. Additional time reduction: crafting or using Armor Padding."
+
+      entries:
+        armor_padding:
+          name: "Armor Padding"
+          type: CUSTOM_ITEM
+          custom-key: armor_padding
+          seconds: 360
+
+    enchants_tier1:
+      display-name: "Early Enchants Tier I"
+      color: "&d"
+      related-materials:
+        - SUGAR_CANE
+        - LEATHER
+        - LAPIS_LAZULI
+        - EMERALD
+      special-info: "Having an Emerald Block (even if not obtained naturally) adds 800% to the progress speed for this section. Additional time reduction: enchanting/disenchanting items or killing mobs."
+
+      entries:
+        enchanted_branch:
+          name: "Enchanted Branch"
+          type: CUSTOM_ITEM
+          custom-key: enchanted_branch
+          seconds: 300
+
+        fire_prot_1:
+          name: "Fire Protection I"
+          type: ENCHANT
+          enchant-key: fire_protection
+          level: 1
+          seconds: 120
+
+        proj_prot_1:
+          name: "Projectile Protection I"
+          type: ENCHANT
+          enchant-key: projectile_protection
+          level: 1
+          seconds: 120
+
+        blast_prot_1:
+          name: "Blast Protection I"
+          type: ENCHANT
+          enchant-key: blast_protection
+          level: 1
+          seconds: 120
+
+        prot_1:
+          name: "Protection I"
+          type: ENCHANT
+          enchant-key: protection
+          level: 1
+          seconds: 120
+
+        eff_1:
+          name: "Efficiency I"
+          type: ENCHANT
+          enchant-key: efficiency
+          level: 1
+          seconds: 120
+
+        fortune_1:
+          name: "Fortune I"
+          type: ENCHANT
+          enchant-key: fortune
+          level: 1
+          seconds: 120
+
+        unbreaking_1:
+          name: "Unbreaking I"
+          type: ENCHANT
+          enchant-key: unbreaking
+          level: 1
+          seconds: 120
+
+        boa_1:
+          name: "Bane of Arthropods I"
+          type: ENCHANT
+          enchant-key: bane_of_arthropods
+          level: 1
+          seconds: 120
+
+        boa_2:
+          name: "Bane of Arthropods II"
+          type: ENCHANT
+          enchant-key: bane_of_arthropods
+          level: 2
+          seconds: 120
+
+        boa_3:
+          name: "Bane of Arthropods III"
+          type: ENCHANT
+          enchant-key: bane_of_arthropods
+          level: 3
+          seconds: 120
+
+        boa_4:
+          name: "Bane of Arthropods IV"
+          type: ENCHANT
+          enchant-key: bane_of_arthropods
+          level: 4
+          seconds: 120
+
+        boa_5:
+          name: "Bane of Arthropods V"
+          type: ENCHANT
+          enchant-key: bane_of_arthropods
+          level: 5
+          seconds: 120
+
+        knockback_1:
+          name: "Knockback I"
+          type: ENCHANT
+          enchant-key: knockback
+          level: 1
+          seconds: 120
+
+        knockback_2:
+          name: "Knockback II"
+          type: ENCHANT
+          enchant-key: knockback
+          level: 2
+          seconds: 120
+
+        silk_touch:
+          name: "Silk Touch"
+          type: ENCHANT
+          enchant-key: silk_touch
+          level: 1
+          seconds: 120
+
+    housing:
+      display-name: "Housing"
+      type: "NORMAL"
+      color: "&b"
+      special-info: ""          # no special
+      related-materials: []     # intentionally empty – we use custom hooks instead
+      entries:
+        build_infrastructure:
+          name: "Build Infrastructure"
+          type: MECHANIC        # abstract mechanic, not a specific item
+          custom-key: "housing_infrastructure"
+          seconds: 7200         # 2 hours
+
+    copper_tools_armor:
+      display-name: "Copper Tools + Copper Armor"
+      color: "&e"
+      related-materials:
+        - RAW_COPPER
+      special-info: "Having a Redstone Lamp (even if not obtained naturally) auto completes this entire section."
+
+      entries:
+        copper_pickaxe:
+          name: "Copper Pickaxe"
+          type: ITEM
+          material: COPPER_PICKAXE
+          seconds: 600
+
+        copper_sword:
+          name: "Copper Sword"
+          type: ITEM
+          material: COPPER_SWORD
+          seconds: 600
+
+        copper_shovel:
+          name: "Copper Shovel"
+          type: ITEM
+          material: COPPER_SHOVEL
+          seconds: 600
+
+        copper_hoe:
+          name: "Copper Hoe"
+          type: ITEM
+          material: COPPER_HOE
+          seconds: 600
+
+        copper_axe:
+          name: "Copper Axe"
+          type: ITEM
+          material: COPPER_AXE
+          seconds: 600
+
+        copper_helmet:
+          name: "Copper Helmet"
+          type: ITEM
+          material: COPPER_HELMET
+          seconds: 600
+
+        copper_boots:
+          name: "Copper Boots"
+          type: ITEM
+          material: COPPER_BOOTS
+          seconds: 600
+
+        copper_leggings:
+          name: "Copper Leggings"
+          type: ITEM
+          material: COPPER_LEGGINGS
+          seconds: 600
+
+        copper_chestplate:
+          name: "Copper Chestplate"
+          type: ITEM
+          material: COPPER_CHESTPLATE
+          seconds: 600
+
+    bows_crossbows_fishing_cobwebs:
+      display-name: "Crossbow + Bow + Fishing Rod + Cobwebs"
+      color: "&5"
+      related-materials:
+        - STRING
+      special-info: "Having a Scaffolding (even if not obtained naturally) adds 800% to the progress speed for this section."
+
+      entries:
+        bow:
+          name: "Bow"
+          type: ITEM
+          material: BOW
+          seconds: 720
+
+        crossbow:
+          name: "Crossbow"
+          type: ITEM
+          material: CROSSBOW
+          seconds: 720
+
+        fishing_rod:
+          name: "Fishing Rod"
+          type: ITEM
+          material: FISHING_ROD
+          seconds: 720
+
+        cobweb:
+          name: "Cobweb"
+          type: ITEM
+          material: COBWEB
+          seconds: 720
+
+    enchants_tier2:
+      display-name: "Mid Enchants Tier II"
+      color: "&3"
+      related-materials:
+        - SUGAR_CANE
+        - LEATHER
+        - LAPIS_LAZULI
+        - EMERALD
+      special-info: "Having a Shipwreck armor trim (even if not obtained naturally) adds 800% to the progress speed for this section. Additional time reduction: enchanting/disenchanting items or killing mobs."
+
+      entries:
+        fire_prot_2:
+          name: "Fire Protection II"
+          type: ENCHANT
+          enchant-key: fire_protection
+          level: 2
+          seconds: 300
+
+        proj_prot_2:
+          name: "Projectile Protection II"
+          type: ENCHANT
+          enchant-key: projectile_protection
+          level: 2
+          seconds: 300
+
+        blast_prot_2:
+          name: "Blast Protection II"
+          type: ENCHANT
+          enchant-key: blast_protection
+          level: 2
+          seconds: 300
+
+        eff_2:
+          name: "Efficiency II"
+          type: ENCHANT
+          enchant-key: efficiency
+          level: 2
+          seconds: 300
+
+        aqua_affinity:
+          name: "Aqua Affinity"
+          type: ENCHANT
+          enchant-key: aqua_affinity
+          level: 1
+          seconds: 300
+
+        depth_strider_1:
+          name: "Depth Strider I"
+          type: ENCHANT
+          enchant-key: depth_strider
+          level: 1
+          seconds: 300
+
+        smite_1:
+          name: "Smite I"
+          type: ENCHANT
+          enchant-key: smite
+          level: 1
+          seconds: 300
+
+        smite_2:
+          name: "Smite II"
+          type: ENCHANT
+          enchant-key: smite
+          level: 2
+          seconds: 300
+
+        smite_3:
+          name: "Smite III"
+          type: ENCHANT
+          enchant-key: smite
+          level: 3
+          seconds: 300
+
+        smite_4:
+          name: "Smite IV"
+          type: ENCHANT
+          enchant-key: smite
+          level: 4
+          seconds: 300
+
+        smite_5:
+          name: "Smite V"
+          type: ENCHANT
+          enchant-key: smite
+          level: 5
+          seconds: 300
+
+        frost_walker_1:
+          name: "Frost Walker I"
+          type: ENCHANT
+          enchant-key: frost_walker
+          level: 1
+          seconds: 300
+
+        mending:
+          name: "Mending"
+          type: ENCHANT
+          enchant-key: mending
+          level: 1
+          seconds: 300
+
+        piercing_1:
+          name: "Piercing I"
+          type: ENCHANT
+          enchant-key: piercing
+          level: 1
+          seconds: 300
+
+        piercing_2:
+          name: "Piercing II"
+          type: ENCHANT
+          enchant-key: piercing
+          level: 2
+          seconds: 300
+
+        piercing_3:
+          name: "Piercing III"
+          type: ENCHANT
+          enchant-key: piercing
+          level: 3
+          seconds: 300
+
+        piercing_4:
+          name: "Piercing IV"
+          type: ENCHANT
+          enchant-key: piercing
+          level: 4
+          seconds: 300
+
+        quick_charge_1:
+          name: "Quick Charge I"
+          type: ENCHANT
+          enchant-key: quick_charge
+          level: 1
+          seconds: 300
+
+        quick_charge_2:
+          name: "Quick Charge II"
+          type: ENCHANT
+          enchant-key: quick_charge
+          level: 2
+          seconds: 300
+
+        quick_charge_3:
+          name: "Quick Charge III"
+          type: ENCHANT
+          enchant-key: quick_charge
+          level: 3
+          seconds: 300
+
+    tnt_fireworks:
+      display-name: "TNT + Fireworks + TNT Minecart + End Crystal"
+      color: "&4"
+      related-materials:
+        - GUNPOWDER
+        - RAW_IRON
+        - SAND
+      special-info: "Having a Creeper Head (even if not obtained naturally) auto completes this entire section. Additional time reduction: killing Creepers or Ghasts."
+
+      entries:
+        tnt:
+          name: "TNT"
+          type: ITEM
+          material: TNT
+          seconds: 900
+
+        fireworks:
+          name: "Firework Rocket"
+          type: ITEM
+          material: FIREWORK_ROCKET
+          seconds: 900
+
+        tnt_minecart:
+          name: "TNT Minecart"
+          type: ITEM
+          material: TNT_MINECART
+          seconds: 900
+
+        end_crystal:
+          name: "End Crystal"
+          type: ITEM
+          material: END_CRYSTAL
+          seconds: 900
+
+    farming:
+      display-name: "Farming"
+      type: "SPECIAL"           # it has a special: craft a cake
+      color: "&a"
+      special-info: "Craft a cake to trigger the special."
+      related-materials: []     # sped up only by custom logic, not config materials
+      entries:
+        farming_progress:
+          name: "Farming"
+          type: MECHANIC
+          custom-key: "farming_progress"
+          seconds: 600          # 10 minutes
+
+    iron_tools_armor:
+      display-name: "Iron Tools + Iron Armor"
+      color: "&7"
+      related-materials:
+        - RAW_IRON
+      special-info: "Having a Netherite Scrap (even if not obtained naturally) auto completes this entire section."
+
+      entries:
+        iron_pickaxe:
+          name: "Iron Pickaxe"
+          type: ITEM
+          material: IRON_PICKAXE
+          seconds: 1200
+
+        iron_sword:
+          name: "Iron Sword"
+          type: ITEM
+          material: IRON_SWORD
+          seconds: 1200
+
+        iron_shovel:
+          name: "Iron Shovel"
+          type: ITEM
+          material: IRON_SHOVEL
+          seconds: 1200
+
+        iron_hoe:
+          name: "Iron Hoe"
+          type: ITEM
+          material: IRON_HOE
+          seconds: 1200
+
+        iron_axe:
+          name: "Iron Axe"
+          type: ITEM
+          material: IRON_AXE
+          seconds: 1200
+
+        iron_helmet:
+          name: "Iron Helmet"
+          type: ITEM
+          material: IRON_HELMET
+          seconds: 1200
+
+        iron_boots:
+          name: "Iron Boots"
+          type: ITEM
+          material: IRON_BOOTS
+          seconds: 1200
+
+        iron_leggings:
+          name: "Iron Leggings"
+          type: ITEM
+          material: IRON_LEGGINGS
+          seconds: 1200
+
+        iron_chestplate:
+          name: "Iron Chestplate"
+          type: ITEM
+          material: IRON_CHESTPLATE
+          seconds: 1200
+
+    blaze_powder:
+      display-name: "Blaze Powder"
+      color: "&c"
+      related-materials:
+        - BLAZE_ROD
+      special-info: "Killing a Blaze speeds this progress by 10000% and skips 1 hour; picking up a Wither Skeleton Skull auto completes it. Additional time reduction: killing Blazes or Wither Skeletons."
+
+      entries:
+        blaze_powder:
+          name: "Blaze Powder"
+          type: ITEM
+          material: BLAZE_POWDER
+          seconds: 345600   # 96 hours
+
+    enderpearl_wind_charge:
+      display-name: "Enderpearl + Wind Charge"
+      color: "&3"
+      related-materials:
+        - ENDER_PEARL
+        - BREEZE_ROD
+      special-info: "Having a Chorus Fruit (even if not obtained naturally) auto completes this section. Additional time reduction: killing Endermen or Breezes."
+
+      entries:
+        ender_pearl:
+          name: "Ender Pearl"
+          type: ITEM
+          material: ENDER_PEARL
+          seconds: 180
+
+        wind_charge:
+          name: "Wind Charge"
+          type: ITEM
+          material: WIND_CHARGE
+          seconds: 180
+
+    heart_meds:
+      display-name: "Heart Meds"
+      color: "&c"
+      related-materials:
+        - GHAST_TEAR
+        - GOLDEN_APPLE
+      special-info: "This section can only be sped up by killing mobs. Killing a player auto completes this section."
+
+      entries:
+        heart_meds:
+          name: "Heart Meds"
+          type: CUSTOM_ITEM
+          custom-key: heart_meds
+          seconds: 1800
+
+    enchants_tier3:
+      display-name: "Higher Enchants Tier III"
+      color: "&1"
+      related-materials:
+        - SUGAR_CANE
+        - LEATHER
+        - LAPIS_LAZULI
+        - EMERALD
+      special-info: "Having a Nether Star (even if not obtained naturally) adds 800% to the progress speed for this section. Additional time reduction: enchanting/disenchanting items or killing mobs."
+
+      entries:
+        fire_prot_3:
+          name: "Fire Protection III"
+          type: ENCHANT
+          enchant-key: fire_protection
+          level: 3
+          seconds: 600
+
+        proj_prot_3:
+          name: "Projectile Protection III"
+          type: ENCHANT
+          enchant-key: projectile_protection
+          level: 3
+          seconds: 600
+
+        blast_prot_3:
+          name: "Blast Protection III"
+          type: ENCHANT
+          enchant-key: blast_protection
+          level: 3
+          seconds: 600
+
+        eff_3:
+          name: "Efficiency III"
+          type: ENCHANT
+          enchant-key: efficiency
+          level: 3
+          seconds: 600
+
+        sharp_1:
+          name: "Sharpness I"
+          type: ENCHANT
+          enchant-key: sharpness
+          level: 1
+          seconds: 600
+
+        power_1:
+          name: "Power I"
+          type: ENCHANT
+          enchant-key: power
+          level: 1
+          seconds: 600
+
+        depth_strider_2:
+          name: "Depth Strider II"
+          type: ENCHANT
+          enchant-key: depth_strider
+          level: 2
+          seconds: 600
+
+        frost_walker_2:
+          name: "Frost Walker II"
+          type: ENCHANT
+          enchant-key: frost_walker
+          level: 2
+          seconds: 600
+
+        fire_aspect_1:
+          name: "Fire Aspect I"
+          type: ENCHANT
+          enchant-key: fire_aspect
+          level: 1
+          seconds: 600
+
+        fortune_2:
+          name: "Fortune II"
+          type: ENCHANT
+          enchant-key: fortune
+          level: 2
+          seconds: 600
+
+        unbreaking_2:
+          name: "Unbreaking II"
+          type: ENCHANT
+          enchant-key: unbreaking
+          level: 2
+          seconds: 600
+
+        soul_speed_1:
+          name: "Soul Speed I"
+          type: ENCHANT
+          enchant-key: soul_speed
+          level: 1
+          seconds: 600
+
+        soul_speed_2:
+          name: "Soul Speed II"
+          type: ENCHANT
+          enchant-key: soul_speed
+          level: 2
+          seconds: 600
+
+        soul_speed_3:
+          name: "Soul Speed III"
+          type: ENCHANT
+          enchant-key: soul_speed
+          level: 3
+          seconds: 600
+
+        loyalty_1:
+          name: "Loyalty I"
+          type: ENCHANT
+          enchant-key: loyalty
+          level: 1
+          seconds: 600
+
+        loyalty_2:
+          name: "Loyalty II"
+          type: ENCHANT
+          enchant-key: loyalty
+          level: 2
+          seconds: 600
+
+        loyalty_3:
+          name: "Loyalty III"
+          type: ENCHANT
+          enchant-key: loyalty
+          level: 3
+          seconds: 600
+
+        channeling:
+          name: "Channeling"
+          type: ENCHANT
+          enchant-key: channeling
+          level: 1
+          seconds: 600
+
+        multishot:
+          name: "Multishot"
+          type: ENCHANT
+          enchant-key: multishot
+          level: 1
+          seconds: 600
+
+        punch_1:
+          name: "Punch I"
+          type: ENCHANT
+          enchant-key: punch
+          level: 1
+          seconds: 600
+
+        punch_2:
+          name: "Punch II"
+          type: ENCHANT
+          enchant-key: punch
+          level: 2
+          seconds: 600
+
+    shulker_shell:
+      display-name: "Shulker Shell"
+      color: "&5"
+      related-materials:
+        - CHORUS_FRUIT
+        - SHULKER_SHELL
+      special-info: "Killing a Shulker or an Enderman while in the End speeds this progress by 10000% and skips 1 hour; picking up an Elytra auto completes it. Additional time reduction: killing Shulkers."
+
+      entries:
+        shulker_shell:
+          name: "Shulker Shell"
+          type: ITEM
+          material: SHULKER_SHELL
+          seconds: 345600   # 96 hours
+
+    diamond_tools_armor:
+      display-name: "Diamond Tools + Diamond Armor"
+      color: "&b"
+      related-materials:
+        - DIAMOND
+      special-info: "Having a Netherite Block (even if not obtained naturally) adds 800% to the progress speed for this section."
+
+      entries:
+        diamond_pickaxe:
+          name: "Diamond Pickaxe"
+          type: ITEM
+          material: DIAMOND_PICKAXE
+          seconds: 2400
+
+        diamond_sword:
+          name: "Diamond Sword"
+          type: ITEM
+          material: DIAMOND_SWORD
+          seconds: 2400
+
+        diamond_shovel:
+          name: "Diamond Shovel"
+          type: ITEM
+          material: DIAMOND_SHOVEL
+          seconds: 2400
+
+        diamond_hoe:
+          name: "Diamond Hoe"
+          type: ITEM
+          material: DIAMOND_HOE
+          seconds: 2400
+
+        diamond_axe:
+          name: "Diamond Axe"
+          type: ITEM
+          material: DIAMOND_AXE
+          seconds: 2400
+
+        diamond_helmet:
+          name: "Diamond Helmet"
+          type: ITEM
+          material: DIAMOND_HELMET
+          seconds: 2400
+
+        diamond_boots:
+          name: "Diamond Boots"
+          type: ITEM
+          material: DIAMOND_BOOTS
+          seconds: 2400
+
+        diamond_leggings:
+          name: "Diamond Leggings"
+          type: ITEM
+          material: DIAMOND_LEGGINGS
+          seconds: 2400
+
+        diamond_chestplate:
+          name: "Diamond Chestplate"
+          type: ITEM
+          material: DIAMOND_CHESTPLATE
+          seconds: 2400
+
+    elytra:
+      display-name: "Elytra"
+      color: "&f"
+      related-materials:
+        - PHANTOM_MEMBRANE
+        - LEATHER
+        - ENDER_PEARL
+      special-info: "Having a Mace (even if not obtained naturally) auto completes this entire section."
+
+      entries:
+        elytra:
+          name: "Elytra"
+          type: ITEM
+          material: ELYTRA
+          seconds: 3600
+
+    enchants_tier4:
+      display-name: "Top Enchants Tier IV"
+      color: "&6"
+      related-materials:
+        - SUGAR_CANE
+        - LEATHER
+        - LAPIS_LAZULI
+        - EMERALD
+      special-info: "Having the Haste II effect adds 800% to the progress speed for this section. Additional time reduction: enchanting/disenchanting items or killing mobs."
+
+      entries:
+        fire_prot_4:
+          name: "Fire Protection IV"
+          type: ENCHANT
+          enchant-key: fire_protection
+          level: 4
+          seconds: 1200
+
+        proj_prot_4:
+          name: "Projectile Protection IV"
+          type: ENCHANT
+          enchant-key: projectile_protection
+          level: 4
+          seconds: 1200
+
+        blast_prot_4:
+          name: "Blast Protection IV"
+          type: ENCHANT
+          enchant-key: blast_protection
+          level: 4
+          seconds: 1200
+
+        prot_2:
+          name: "Protection II"
+          type: ENCHANT
+          enchant-key: protection
+          level: 2
+          seconds: 1200
+
+        eff_4:
+          name: "Efficiency IV"
+          type: ENCHANT
+          enchant-key: efficiency
+          level: 4
+          seconds: 1200
+
+        sharp_2:
+          name: "Sharpness II"
+          type: ENCHANT
+          enchant-key: sharpness
+          level: 2
+          seconds: 1200
+
+        power_2:
+          name: "Power II"
+          type: ENCHANT
+          enchant-key: power
+          level: 2
+          seconds: 1200
+
+        sharp_3:
+          name: "Sharpness III"
+          type: ENCHANT
+          enchant-key: sharpness
+          level: 3
+          seconds: 1200
+
+        power_3:
+          name: "Power III"
+          type: ENCHANT
+          enchant-key: power
+          level: 3
+          seconds: 1200
+
+        depth_strider_3:
+          name: "Depth Strider III"
+          type: ENCHANT
+          enchant-key: depth_strider
+          level: 3
+          seconds: 1200
+
+        fire_aspect_2:
+          name: "Fire Aspect II"
+          type: ENCHANT
+          enchant-key: fire_aspect
+          level: 2
+          seconds: 1200
+
+        fortune_3:
+          name: "Fortune III"
+          type: ENCHANT
+          enchant-key: fortune
+          level: 3
+          seconds: 1200
+
+        unbreaking_3:
+          name: "Unbreaking III"
+          type: ENCHANT
+          enchant-key: unbreaking
+          level: 3
+          seconds: 1200
+
+        prot_3:
+          name: "Protection III"
+          type: ENCHANT
+          enchant-key: protection
+          level: 3
+          seconds: 1200
+
+        flame:
+          name: "Flame"
+          type: ENCHANT
+          enchant-key: flame
+          level: 1
+          seconds: 1200
+
+        infinity:
+          name: "Infinity"
+          type: ENCHANT
+          enchant-key: infinity
+          level: 1
+          seconds: 1200
+
+        breach_1:
+          name: "Breach I"
+          type: ENCHANT
+          enchant-key: breach
+          level: 1
+          seconds: 1200
+
+        density_1:
+          name: "Density I"
+          type: ENCHANT
+          enchant-key: density
+          level: 1
+          seconds: 1200
+
+        sharp_4:
+          name: "Sharpness IV"
+          type: ENCHANT
+          enchant-key: sharpness
+          level: 4
+          seconds: 1200
+
+        power_4:
+          name: "Power IV"
+          type: ENCHANT
+          enchant-key: power
+          level: 4
+          seconds: 1200
+
+        swift_sneak_1:
+          name: "Swift Sneak I"
+          type: ENCHANT
+          enchant-key: swift_sneak
+          level: 1
+          seconds: 1200
+
+        swift_sneak_2:
+          name: "Swift Sneak II"
+          type: ENCHANT
+          enchant-key: swift_sneak
+          level: 2
+          seconds: 1200
+
+        swift_sneak_3:
+          name: "Swift Sneak III"
+          type: ENCHANT
+          enchant-key: swift_sneak
+          level: 3
+          seconds: 1200
+
+        wind_burst_1:
+          name: "Wind Burst I"
+          type: ENCHANT
+          enchant-key: wind_burst
+          level: 1
+          seconds: 1200
+
+        density_2:
+          name: "Density II"
+          type: ENCHANT
+          enchant-key: density
+          level: 2
+          seconds: 1200
+
+        breach_2:
+          name: "Breach II"
+          type: ENCHANT
+          enchant-key: breach
+          level: 2
+          seconds: 1200
+
+        breach_3:
+          name: "Breach III"
+          type: ENCHANT
+          enchant-key: breach
+          level: 3
+          seconds: 1200
+
+        sharp_5:
+          name: "Sharpness V"
+          type: ENCHANT
+          enchant-key: sharpness
+          level: 5
+          seconds: 1200
+
+        wind_burst_2:
+          name: "Wind Burst II"
+          type: ENCHANT
+          enchant-key: wind_burst
+          level: 2
+          seconds: 1200
+
+        wind_burst_3:
+          name: "Wind Burst III"
+          type: ENCHANT
+          enchant-key: wind_burst
+          level: 3
+          seconds: 1200
+
+        power_5:
+          name: "Power V"
+          type: ENCHANT
+          enchant-key: power
+          level: 5
+          seconds: 1200
+
+        density_3:
+          name: "Density III"
+          type: ENCHANT
+          enchant-key: density
+          level: 3
+          seconds: 1200
+
+    netherite_tools_armor:
+      display-name: "Netherite Tools + Netherite Armor"
+      color: "&5"
+      related-materials:
+        - ANCIENT_DEBRIS
+      special-info: "Having a Dragon Egg (even if not obtained naturally) adds 800% to the progress speed for this section."
+
+      entries:
+        netherite_pickaxe:
+          name: "Netherite Pickaxe"
+          type: ITEM
+          material: NETHERITE_PICKAXE
+          seconds: 7200
+
+        netherite_sword:
+          name: "Netherite Sword"
+          type: ITEM
+          material: NETHERITE_SWORD
+          seconds: 7200
+
+        netherite_shovel:
+          name: "Netherite Shovel"
+          type: ITEM
+          material: NETHERITE_SHOVEL
+          seconds: 7200
+
+        netherite_hoe:
+          name: "Netherite Hoe"
+          type: ITEM
+          material: NETHERITE_HOE
+          seconds: 7200
+
+        netherite_axe:
+          name: "Netherite Axe"
+          type: ITEM
+          material: NETHERITE_AXE
+          seconds: 7200
+
+        netherite_helmet:
+          name: "Netherite Helmet"
+          type: ITEM
+          material: NETHERITE_HELMET
+          seconds: 7200
+
+        netherite_boots:
+          name: "Netherite Boots"
+          type: ITEM
+          material: NETHERITE_BOOTS
+          seconds: 7200
+
+        netherite_leggings:
+          name: "Netherite Leggings"
+          type: ITEM
+          material: NETHERITE_LEGGINGS
+          seconds: 7200
+
+        netherite_chestplate:
+          name: "Netherite Chestplate"
+          type: ITEM
+          material: NETHERITE_CHESTPLATE
+          seconds: 7200

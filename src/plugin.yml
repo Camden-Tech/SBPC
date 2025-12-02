@@ -1,0 +1,23 @@
+name: SBPC
+main: me.BaddCamden.SBPC.SBPCPlugin
+version: 1.0.0
+api-version: 1.21
+author: BaddCamden
+description: Session Based Progression Cap using SessionManager
+
+depend:
+  - SessionLibrary
+
+commands:
+  sbpc:
+    description: SBPC admin commands
+    usage: "/sbpc <reloadConfig>"
+    permission: sbpc.admin
+  currenttimeskip:
+    description: Shows your current section’s related materials and special info
+    usage: "/currenttimeskip"
+
+permissions:
+  sbpc.admin:
+    description: Allows SBPC admin commands
+    default: op
