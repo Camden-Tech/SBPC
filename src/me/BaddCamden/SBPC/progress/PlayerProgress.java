@@ -363,6 +363,40 @@ public class PlayerProgress {
         this.firstStepsIntroShown = value;
     }
 
+    public void applyGlobalUnlocks(Set<String> entryIds, Set<String> sectionIds) {
+        boolean changed = true;
+        while (changed) {
+            changed = false;
+            ProgressEntry current = getCurrentEntry();
+            if (current == null) {
+                break;
+            }
+
+            if (containsIgnoreCase(sectionIds, current.getSectionId())) {
+                completeCurrentSection();
+                changed = true;
+                continue;
+            }
+
+            if (containsIgnoreCase(entryIds, current.getId())) {
+                skipCurrentEntry();
+                changed = true;
+            }
+        }
+    }
+
+    private boolean containsIgnoreCase(Set<String> values, String needle) {
+        if (values == null || needle == null) {
+            return false;
+        }
+        for (String value : values) {
+            if (value != null && value.equalsIgnoreCase(needle)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     // ------------------------------------------------------------------------
     // Core ticking
@@ -397,6 +431,14 @@ public class PlayerProgress {
         }
 
         updateBossBar();
+    }
+
+    public void skipCurrentEntry() {
+        ProgressEntry entry = getCurrentEntry();
+        if (entry == null) return;
+        unlockCurrentEntry(entry);
+        timeAccumulator = 0.0;
+        advanceToNextEntry();
     }
     private void unlockCurrentEntry(ProgressEntry entry) {
         unlockedEntries.add(entry.getId());

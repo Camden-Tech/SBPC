@@ -51,6 +51,11 @@ public class ProgressManager implements Listener {
     private final List<SectionDefinition> sections = new ArrayList<>();
     private final List<ProgressEntry> allEntries = new ArrayList<>();
     private double globalSpeedMultiplier = 1.0;
+    private int globalDefaultSkipSeconds = 0;
+    private double globalDefaultSpeedPercent = 0.0;
+    private boolean timerPaused = false;
+    private final Set<String> globallyUnlockedEntries = ConcurrentHashMap.newKeySet();
+    private final Set<String> globallyUnlockedSections = ConcurrentHashMap.newKeySet();
     private double relatedBonusPercentPerHit = 3.0;
     private int relatedBonusSkipSeconds = 10;
 
@@ -345,6 +350,44 @@ public class ProgressManager implements Listener {
         this.globalSpeedMultiplier = globalSpeedMultiplier;
     }
 
+    public void setGlobalTimeSkipDefaults(int skipSeconds, double percentSpeedIncrease) {
+        if (skipSeconds < 0) {
+            skipSeconds = 0;
+        }
+        this.globalDefaultSkipSeconds = skipSeconds;
+        this.globalDefaultSpeedPercent = percentSpeedIncrease;
+    }
+
+    public void applyGlobalTimeSkip(int skipSeconds, double percentSpeedIncrease, String sourceDescription) {
+        int effectiveSkip = skipSeconds + globalDefaultSkipSeconds;
+        double effectiveSpeed = percentSpeedIncrease + globalDefaultSpeedPercent;
+
+        for (PlayerProgress prog : progressMap.values()) {
+            prog.applyExternalTimeSkip(effectiveSkip, effectiveSpeed, sourceDescription);
+        }
+    }
+
+    public void addGlobalEntryUnlock(String entryId) {
+        if (entryId == null || entryId.isEmpty()) return;
+        globallyUnlockedEntries.add(entryId.toLowerCase(Locale.ROOT));
+        for (PlayerProgress prog : progressMap.values()) {
+            applyGlobalUnlocks(prog);
+        }
+    }
+
+    public void addGlobalSectionUnlock(String sectionId) {
+        if (sectionId == null || sectionId.isEmpty()) return;
+        globallyUnlockedSections.add(sectionId.toLowerCase(Locale.ROOT));
+        for (PlayerProgress prog : progressMap.values()) {
+            applyGlobalUnlocks(prog);
+        }
+    }
+
+    public void clearGlobalUnlocks() {
+        globallyUnlockedEntries.clear();
+        globallyUnlockedSections.clear();
+    }
+
     public void setRelatedBonusDefaults(double bonusPercent, int skipSeconds) {
         if (bonusPercent < 0) {
             bonusPercent = 0;
@@ -373,6 +416,7 @@ public class ProgressManager implements Listener {
                 prog.setFirstStepsIntroShown(st.firstStepsIntroShown);
             }
             prog.setRelatedBonus(relatedBonusPercentPerHit, relatedBonusSkipSeconds);
+            applyGlobalUnlocks(prog);
             return prog;
         });
     }
@@ -447,7 +491,34 @@ public class ProgressManager implements Listener {
         if (System.currentTimeMillis() - last > 2 * 60 * 1000L) return;
 
         PlayerProgress prog = getOrCreateProgress(uuid);
+        applyGlobalUnlocks(prog);
+        if (timerPaused) {
+            return;
+        }
+
         prog.tick(1.0 * globalSpeedMultiplier);
+    }
+
+    public void stopAllTimers() {
+        timerPaused = true;
+        for (BossBar bar : bossBars.values()) {
+            bar.removeAll();
+        }
+    }
+
+    public void startAllTimers() {
+        timerPaused = false;
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            ensureBossBar(player);
+        }
+    }
+
+    public boolean isTimerPaused() {
+        return timerPaused;
+    }
+
+    private void applyGlobalUnlocks(PlayerProgress prog) {
+        prog.applyGlobalUnlocks(globallyUnlockedEntries, globallyUnlockedSections);
     }
 
     // ------------------------------------------------------------------------

@@ -376,6 +376,20 @@ progression:
           custom-key: armor_padding
           seconds: 360
 
+    murder:
+      display-name: "Murder"
+      broadcast-unlock: false
+      color: "§4"
+      related-materials: []
+      special-info: "Killing another player unlocks this entire section (handled by hooks)."
+
+      entries:
+        murder_kill_player:
+          name: "Kill a player"
+          type: MECHANIC
+          custom-key: "murder_kill_player"
+          seconds: 3600
+
     enchants_tier1:
       display-name: "Early Enchants Tier I"
       color: "§d"
@@ -865,6 +879,32 @@ progression:
           material: IRON_CHESTPLATE
           seconds: 1200
 
+    massacre:
+      display-name: "Massacre"
+      broadcast-unlock: false
+      color: "§4"
+      related-materials: []
+      special-info: "Killing another unique player unlocks the current entry (handled by hooks)."
+
+      entries:
+        massacre_unique_1:
+          name: "Kill a unique player"
+          type: MECHANIC
+          custom-key: "massacre_unique_1"
+          seconds: 3600
+
+        massacre_unique_2:
+          name: "Kill another unique player"
+          type: MECHANIC
+          custom-key: "massacre_unique_2"
+          seconds: 3600
+
+        massacre_unique_3:
+          name: "Kill one last unique player"
+          type: MECHANIC
+          custom-key: "massacre_unique_3"
+          seconds: 3600
+
     blaze_powder:
       display-name: "Blaze Powder"
       color: "§c"
@@ -1149,6 +1189,20 @@ progression:
           type: ITEM
           material: DIAMOND_CHESTPLATE
           seconds: 2400
+
+    serial_killer:
+      display-name: "Serial Killer"
+      broadcast-unlock: false
+      color: "§5"
+      related-materials: []
+      special-info: "Each player kill skips 30 minutes from this entry (handled by hooks)."
+
+      entries:
+        serial_killer_kill_them_all:
+          name: "Kill Them All"
+          type: MECHANIC
+          custom-key: "serial_killer_kill_them_all"
+          seconds: 10800
 
     elytra:
       display-name: "Elytra"
