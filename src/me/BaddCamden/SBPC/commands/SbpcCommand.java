@@ -38,8 +38,7 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 0) {
-            sendUsage(sender);
-            return true;
+            return false;
         }
 
         String sub = args[0].toLowerCase(Locale.ROOT);
@@ -55,8 +54,7 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
             case "config":
                 return handleConfig(sender, args);
             default:
-                sendUsage(sender);
-                return true;
+                return false;
         }
     }
 
@@ -144,7 +142,7 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
     private boolean handleJump(CommandSender sender, String[] args) {
         if (args.length < 4) {
             sender.sendMessage("§eUsage: /sbpc jump <section|entry> <player> <id>");
-            return true;
+            return false;
         }
 
         String kind = args[1].toLowerCase(Locale.ROOT);
@@ -161,12 +159,12 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
             success = plugin.getProgressManager().jumpPlayerToEntry(target.getUniqueId(), args[3]);
         } else {
             sender.sendMessage("§cJump target must be section or entry.");
-            return true;
+            return false;
         }
 
         if (!success) {
             sender.sendMessage("§cNo matching " + kind + " found for id '" + args[3] + "'.");
-            return true;
+            return false;
         }
 
         Player online = target.getPlayer();
@@ -182,26 +180,23 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
     private boolean handleSpeed(CommandSender sender, String[] args) {
         if (args.length < 3) {
             sender.sendMessage("§eUsage: /sbpc speed <player|global> <target> <multiplier>");
-            return true;
+            return false;
         }
 
         String mode = args[1].toLowerCase(Locale.ROOT);
         if (mode.equals("player")) {
             if (args.length < 4) {
                 sender.sendMessage("§eUsage: /sbpc speed player <player> <multiplier>");
-                return true;
+                return false;
             }
             OfflinePlayer target = Bukkit.getOfflinePlayer(args[2]);
             if (target == null || target.getUniqueId() == null) {
                 sender.sendMessage("§cUnknown player: " + args[2]);
                 return true;
             }
-            double mult;
-            try {
-                mult = Double.parseDouble(args[3]);
-            } catch (NumberFormatException ex) {
-                sender.sendMessage("§cMultiplier must be a number.");
-                return true;
+            Double mult = parseDouble(args[3], sender, "§cMultiplier must be a number.");
+            if (mult == null) {
+                return false;
             }
 
             plugin.getProgressManager().setPlayerSpeed(target.getUniqueId(), mult);
@@ -215,12 +210,9 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         }
 
         if (mode.equals("global")) {
-            double mult;
-            try {
-                mult = Double.parseDouble(args[2]);
-            } catch (NumberFormatException ex) {
-                sender.sendMessage("§cMultiplier must be a number.");
-                return true;
+            Double mult = parseDouble(args[2], sender, "§cMultiplier must be a number.");
+            if (mult == null) {
+                return false;
             }
 
             plugin.getProgressManager().setGlobalSpeedMultiplier(mult);
@@ -232,13 +224,13 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         }
 
         sender.sendMessage("§cSpeed target must be player or global.");
-        return true;
+        return false;
     }
 
     private boolean handleConfig(CommandSender sender, String[] args) {
         if (args.length < 3) {
             sender.sendMessage("§eUsage: /sbpc config <section|entry> ...");
-            return true;
+            return false;
         }
 
         String kind = args[1].toLowerCase(Locale.ROOT);
@@ -250,13 +242,13 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         }
 
         sender.sendMessage("§cConfig target must be section or entry.");
-        return true;
+        return false;
     }
 
     private boolean handleSectionConfig(CommandSender sender, String[] args) {
         if (args.length < 5) {
             sender.sendMessage("§eUsage: /sbpc config section <sectionId> <set|add-related|remove-related> ...");
-            return true;
+            return false;
         }
 
         String sectionId = args[2];
@@ -265,14 +257,14 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         String basePath = "progression.sections." + sectionId;
         if (!cfg.isConfigurationSection(basePath)) {
             sender.sendMessage("§cUnknown section id: " + sectionId);
-            return true;
+            return false;
         }
 
         switch (action) {
             case "set": {
                 if (args.length < 6) {
                     sender.sendMessage("§eUsage: /sbpc config section " + sectionId + " set <display-name|color|special-info> <value>");
-                    return true;
+                    return false;
                 }
                 String field = args[4].toLowerCase(Locale.ROOT);
                 String value = String.join(" ", Arrays.copyOfRange(args, 5, args.length));
@@ -284,7 +276,7 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
                     cfg.set(basePath + ".special-info", value);
                 } else {
                     sender.sendMessage("§cUnknown section field: " + field);
-                    return true;
+                    return false;
                 }
                 break;
             }
@@ -292,7 +284,7 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
                 Material mat = Material.matchMaterial(args[4]);
                 if (mat == null) {
                     sender.sendMessage("§cUnknown material: " + args[4]);
-                    return true;
+                    return false;
                 }
                 List<String> mats = new ArrayList<>(cfg.getStringList(basePath + ".related-materials"));
                 if (!mats.contains(mat.name())) {
@@ -305,7 +297,7 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
                 Material mat = Material.matchMaterial(args[4]);
                 if (mat == null) {
                     sender.sendMessage("§cUnknown material: " + args[4]);
-                    return true;
+                    return false;
                 }
                 List<String> mats = new ArrayList<>(cfg.getStringList(basePath + ".related-materials"));
                 mats.removeIf(s -> s.equalsIgnoreCase(mat.name()));
@@ -314,7 +306,7 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
             }
             default:
                 sender.sendMessage("§cUnknown section action: " + action);
-                return true;
+                return false;
         }
 
         applyConfigReload(sender, "section " + sectionId);
@@ -324,7 +316,7 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
     private boolean handleEntryConfig(CommandSender sender, String[] args) {
         if (args.length < 6) {
             sender.sendMessage("§eUsage: /sbpc config entry <sectionId> <entryId> set <field> <value>");
-            return true;
+            return false;
         }
 
         String sectionId = args[2];
@@ -335,18 +327,18 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         String basePath = "progression.sections." + sectionId + ".entries." + entryId;
         if (!cfg.isConfigurationSection(basePath)) {
             sender.sendMessage("§cUnknown entry id: " + entryId + " in section " + sectionId);
-            return true;
+            return false;
         }
 
         if (!action.equals("set")) {
             sender.sendMessage("§cEntry action must be set.");
-            return true;
+            return false;
         }
 
         String field = args[5].toLowerCase(Locale.ROOT);
         if (args.length < 7) {
             sender.sendMessage("§eUsage: /sbpc config entry " + sectionId + " " + entryId + " set <field> <value>");
-            return true;
+            return false;
         }
         String value = String.join(" ", Arrays.copyOfRange(args, 6, args.length));
 
@@ -355,12 +347,11 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
                 cfg.set(basePath + ".name", value);
                 break;
             case "seconds":
-                try {
-                    cfg.set(basePath + ".seconds", Integer.parseInt(value));
-                } catch (NumberFormatException ex) {
-                    sender.sendMessage("§cSeconds must be a number.");
-                    return true;
+                Integer seconds = parseInteger(value, sender, "§cSeconds must be a number.");
+                if (seconds == null) {
+                    return false;
                 }
+                cfg.set(basePath + ".seconds", seconds);
                 break;
             case "type":
                 cfg.set(basePath + ".type", value.toUpperCase(Locale.ROOT));
@@ -368,7 +359,7 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
             case "material":
                 if (Material.matchMaterial(value) == null) {
                     sender.sendMessage("§cUnknown material: " + value);
-                    return true;
+                    return false;
                 }
                 cfg.set(basePath + ".material", value.toUpperCase(Locale.ROOT));
                 break;
@@ -379,16 +370,15 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
                 cfg.set(basePath + ".enchant-key", value.toLowerCase(Locale.ROOT));
                 break;
             case "level":
-                try {
-                    cfg.set(basePath + ".level", Integer.parseInt(value));
-                } catch (NumberFormatException ex) {
-                    sender.sendMessage("§cLevel must be a number.");
-                    return true;
+                Integer level = parseInteger(value, sender, "§cLevel must be a number.");
+                if (level == null) {
+                    return false;
                 }
+                cfg.set(basePath + ".level", level);
                 break;
             default:
                 sender.sendMessage("§cUnknown entry field: " + field);
-                return true;
+                return false;
         }
 
         applyConfigReload(sender, "entry " + entryId);
@@ -444,12 +434,22 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         return ids.isEmpty() ? getEntryIds() : ids;
     }
 
-    private void sendUsage(CommandSender sender) {
-        sender.sendMessage("§eUsage:");
-        sender.sendMessage("§7/sbpc reloadConfig");
-        sender.sendMessage("§7/sbpc jump <section|entry> <player> <id>");
-        sender.sendMessage("§7/sbpc speed <player|global> <target> <multiplier>");
-        sender.sendMessage("§7/sbpc config section <sectionId> <set|add-related|remove-related> ...");
-        sender.sendMessage("§7/sbpc config entry <sectionId> <entryId> set <field> <value>");
+    private Double parseDouble(String raw, CommandSender sender, String errorMessage) {
+        try {
+            return Double.parseDouble(raw);
+        } catch (NumberFormatException ex) {
+            sender.sendMessage(errorMessage);
+            return null;
+        }
     }
+
+    private Integer parseInteger(String raw, CommandSender sender, String errorMessage) {
+        try {
+            return Integer.parseInt(raw);
+        } catch (NumberFormatException ex) {
+            sender.sendMessage(errorMessage);
+            return null;
+        }
+    }
+
 }
