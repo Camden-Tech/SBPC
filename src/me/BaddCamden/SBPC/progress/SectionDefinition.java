@@ -19,6 +19,7 @@ public class SectionDefinition {
     private final Set<Material> relatedMaterials;
     private final String specialInfo;
     private final String colorCode;
+    private final boolean broadcastUnlock;
     
 
     /**
@@ -33,13 +34,15 @@ public class SectionDefinition {
                              Set<Material> relatedMaterials,
                              String specialInfo,
                              String colorCode,
-                             String type) {
+                             String type,
+                             boolean broadcastUnlock) {
         this.id = id;
         this.displayName = displayName;
         this.entries = Collections.unmodifiableList(entries);
         this.relatedMaterials = Collections.unmodifiableSet(relatedMaterials);
         this.specialInfo = specialInfo == null ? "" : specialInfo;
         this.colorCode = colorCode == null ? "&e" : colorCode;
+        this.broadcastUnlock = broadcastUnlock;
         // If no type is provided, default to NORMAL.
         // Infer section type if not explicitly stored elsewhere:
         // If this section has special-info text, treat it as SPECIAL, else NORMAL.
@@ -49,7 +52,7 @@ public class SectionDefinition {
         } else {
             inferredType = "NORMAL";
         }
-        this.type = inferredType;
+        this.type = (type != null && !type.isEmpty()) ? type : inferredType;
 
     }
 
@@ -75,6 +78,10 @@ public class SectionDefinition {
 
     public String getColorCode() {
         return colorCode;
+    }
+
+    public boolean shouldBroadcastUnlock() {
+        return broadcastUnlock;
     }
 
     /**

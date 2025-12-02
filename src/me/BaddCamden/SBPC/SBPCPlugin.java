@@ -8,6 +8,7 @@ import me.BaddCamden.SBPC.commands.SbpcCommand;
 import me.BaddCamden.SBPC.config.MessageConfig;
 import me.BaddCamden.SBPC.commands.CurrentTimeSkipCommand;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -111,6 +112,14 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         MessageConfig.load(cfg);
         double globalSpeed = cfg.getDouble("progression.global-speed-multiplier", 1.0);
         progressManager.setGlobalSpeedMultiplier(globalSpeed);
+        ConfigurationSection relatedCfg = cfg.getConfigurationSection("progression.related-bonus");
+        double relatedPercent = 3.0;
+        int relatedSkipSeconds = 10;
+        if (relatedCfg != null) {
+            relatedPercent = relatedCfg.getDouble("percent-speed-increase", relatedPercent);
+            relatedSkipSeconds = relatedCfg.getInt("skip-seconds", relatedSkipSeconds);
+        }
+        progressManager.setRelatedBonusDefaults(relatedPercent, relatedSkipSeconds);
         configureSessionLibraryIntegration();
     }
 

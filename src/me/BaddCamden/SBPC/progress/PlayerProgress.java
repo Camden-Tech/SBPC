@@ -443,17 +443,19 @@ public class PlayerProgress {
                 player.sendMessage(MessageConfig.get("new-section-reset"));
                 player.sendMessage(MessageConfig.get("new-section-collect"));
 
-                // NEW: global broadcast with per-section color
-                String colorCode = newSection.getColorCode();
-                String coloredName = MessageConfig.colorize(
-                        (colorCode != null ? colorCode : "") + newSection.getDisplayName()
-                );
-                Map<String, String> phBroadcast = new HashMap<>();
-                phBroadcast.put("player", player.getName());
-                phBroadcast.put("section", newSection.getDisplayName());
-                phBroadcast.put("section-colored", coloredName);
-                String broadcast = MessageConfig.format("section-unlock-broadcast", phBroadcast);
-                Bukkit.broadcastMessage(broadcast);
+                if (newSection.shouldBroadcastUnlock()) {
+                    // NEW: global broadcast with per-section color
+                    String colorCode = newSection.getColorCode();
+                    String coloredName = MessageConfig.colorize(
+                            (colorCode != null ? colorCode : "") + newSection.getDisplayName()
+                    );
+                    Map<String, String> phBroadcast = new HashMap<>();
+                    phBroadcast.put("player", player.getName());
+                    phBroadcast.put("section", newSection.getDisplayName());
+                    phBroadcast.put("section-colored", coloredName);
+                    String broadcast = MessageConfig.format("section-unlock-broadcast", phBroadcast);
+                    Bukkit.broadcastMessage(broadcast);
+                }
             }
 
             NextSectionEvent ev = new NextSectionEvent(player, newSection);
@@ -480,9 +482,11 @@ public class PlayerProgress {
 
         if (!benefitMessageSent.contains(sectionId)) {
             benefitMessageSent.add(sectionId);
-            player.sendMessage("§aYou have collected " + materialName +
-                    ". This section skips " + skipSeconds +
-                    " seconds and speeds up by " + bonusPercent + "% each time!");
+            Map<String, String> placeholders = new HashMap<>();
+            placeholders.put("material", materialName);
+            placeholders.put("seconds", Integer.toString(skipSeconds));
+            placeholders.put("percent", Double.toString(bonusPercent));
+            player.sendMessage(MessageConfig.format("related-bonus", placeholders));
         }
     }
 

@@ -51,6 +51,8 @@ public class ProgressManager implements Listener {
     private final List<SectionDefinition> sections = new ArrayList<>();
     private final List<ProgressEntry> allEntries = new ArrayList<>();
     private double globalSpeedMultiplier = 1.0;
+    private double relatedBonusPercentPerHit = 3.0;
+    private int relatedBonusSkipSeconds = 10;
 
     class SavedState {
         int currentIndex;
@@ -91,6 +93,7 @@ public class ProgressManager implements Listener {
                 String displayName = sec.getString("display-name", secId);
                 String specialInfo = sec.getString("special-info", "");
                 String colorCode = sec.getString("color", "&e");
+                boolean broadcastUnlock = sec.getBoolean("broadcast-unlock", true);
 
                 // NEW: section type
                 // If "type" is present in config, use it.
@@ -191,7 +194,8 @@ public class ProgressManager implements Listener {
                         related,
                         specialInfo,
                         colorCode,
-                        type 
+                        type,
+                        broadcastUnlock
                 );
                 sections.add(def);
             }
@@ -341,6 +345,22 @@ public class ProgressManager implements Listener {
         this.globalSpeedMultiplier = globalSpeedMultiplier;
     }
 
+    public void setRelatedBonusDefaults(double bonusPercent, int skipSeconds) {
+        if (bonusPercent < 0) {
+            bonusPercent = 0;
+        }
+        if (skipSeconds < 0) {
+            skipSeconds = 0;
+        }
+
+        this.relatedBonusPercentPerHit = bonusPercent;
+        this.relatedBonusSkipSeconds = skipSeconds;
+
+        for (PlayerProgress prog : progressMap.values()) {
+            prog.setRelatedBonus(bonusPercent, skipSeconds);
+        }
+    }
+
     public PlayerProgress getOrCreateProgress(UUID uuid) {
         return progressMap.computeIfAbsent(uuid, u -> {
             BossBar bar = Bukkit.createBossBar("Progress", BarColor.BLUE, BarStyle.SOLID);
@@ -352,6 +372,7 @@ public class ProgressManager implements Listener {
                 prog.loadState(st.currentIndex, st.remainingSeconds, st.unlocked, st.adminSpeedMultiplier);
                 prog.setFirstStepsIntroShown(st.firstStepsIntroShown);
             }
+            prog.setRelatedBonus(relatedBonusPercentPerHit, relatedBonusSkipSeconds);
             return prog;
         });
     }
