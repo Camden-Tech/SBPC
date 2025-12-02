@@ -1,9 +1,6 @@
 session:
   session-library-enabled: true  # Disable to ignore SessionLibrary entirely and keep sessions always active
-  window-day: WEDNESDAY          # DayOfWeek enum
-  start-time: "19:00"            # 7 PM
-  end-time: "22:00"              # 10 PM
-  timezone: "America/Chicago"
+
 
 messages:
   server-closed-join: "&cThe server is currently closed. There is currently no active session."
