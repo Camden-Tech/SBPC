@@ -97,7 +97,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
             progressManager.clearBossBars();
             HandlerList.unregisterAll(progressManager);
         }
+
         HandlerList.unregisterAll((Plugin) this);
+
         if (sessionLibraryListener != null) {
             HandlerList.unregisterAll(sessionLibraryListener);
         }
@@ -107,6 +109,8 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
     public void loadConfigValues() {
         FileConfiguration cfg = getConfig();
         MessageConfig.load(cfg);
+        double globalSpeed = cfg.getDouble("progression.global-speed-multiplier", 1.0);
+        progressManager.setGlobalSpeedMultiplier(globalSpeed);
         configureSessionLibraryIntegration();
     }
 
@@ -174,7 +178,7 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
     private void tickPlayers() {
         if (!sessionActive) return;
         for (Player p : Bukkit.getOnlinePlayers()) {
-            progressManager.tickPlayer(p, 1);
+            progressManager.tickPlayer(p);
         }
     }
 

@@ -11,7 +11,7 @@ softdepend:
 commands:
   sbpc:
     description: SBPC admin commands
-    usage: "/sbpc <reloadConfig>"
+    usage: "/sbpc <reloadConfig|jump|speed|config>"
     permission: sbpc.admin
   currenttimeskip:
     description: Shows your current section’s related materials and special info

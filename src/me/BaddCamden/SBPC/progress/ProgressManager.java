@@ -50,12 +50,14 @@ public class ProgressManager implements Listener {
 
     private final List<SectionDefinition> sections = new ArrayList<>();
     private final List<ProgressEntry> allEntries = new ArrayList<>();
+    private double globalSpeedMultiplier = 1.0;
 
     class SavedState {
         int currentIndex;
         int remainingSeconds;
         boolean firstStepsIntroShown;
         Set<String> unlocked = new HashSet<>();
+        double adminSpeedMultiplier = 1.0;
     }
 
 
@@ -202,7 +204,8 @@ public class ProgressManager implements Listener {
         for (Map.Entry<UUID, PlayerProgress> e : progressMap.entrySet()) {
             SavedState st = savedStates.get(e.getKey());
             if (st != null) {
-                e.getValue().loadState(st.currentIndex, st.remainingSeconds, st.unlocked);
+                e.getValue().loadState(st.currentIndex, st.remainingSeconds, st.unlocked, st.adminSpeedMultiplier);
+                e.getValue().setFirstStepsIntroShown(st.firstStepsIntroShown);
                 e.getValue().updateBossBar();
             }
         }
@@ -234,6 +237,7 @@ public class ProgressManager implements Listener {
                 st.currentIndex = data.getInt("current-index", 0);
                 st.remainingSeconds = data.getInt("remaining-seconds", 0);
                 st.firstStepsIntroShown = data.getBoolean("first-steps-intro-shown", false);
+                st.adminSpeedMultiplier = data.getDouble("admin-speed-multiplier", 1.0);
 
                 List<String> unlockedList = data.getStringList("unlocked-entries");
                 Set<String> filtered = new HashSet<>();
@@ -275,6 +279,7 @@ public class ProgressManager implements Listener {
             data.set("remaining-seconds", p.getRemainingSeconds());
             data.set("unlocked-entries", new ArrayList<>(p.getUnlockedEntryIds()));
             data.set("first-steps-intro-shown", p.isFirstStepsIntroShown());
+            data.set("admin-speed-multiplier", p.getAdminSpeedMultiplier());
 
             try {
                 data.save(file);
@@ -325,6 +330,17 @@ public class ProgressManager implements Listener {
         return allEntries;
     }
 
+    public double getGlobalSpeedMultiplier() {
+        return globalSpeedMultiplier;
+    }
+
+    public void setGlobalSpeedMultiplier(double globalSpeedMultiplier) {
+        if (globalSpeedMultiplier < 0) {
+            globalSpeedMultiplier = 0;
+        }
+        this.globalSpeedMultiplier = globalSpeedMultiplier;
+    }
+
     public PlayerProgress getOrCreateProgress(UUID uuid) {
         return progressMap.computeIfAbsent(uuid, u -> {
             BossBar bar = Bukkit.createBossBar("Progress", BarColor.BLUE, BarStyle.SOLID);
@@ -333,11 +349,51 @@ public class ProgressManager implements Listener {
 
             SavedState st = savedStates.remove(u);
             if (st != null) {
-                prog.loadState(st.currentIndex, st.remainingSeconds, st.unlocked);
+                prog.loadState(st.currentIndex, st.remainingSeconds, st.unlocked, st.adminSpeedMultiplier);
                 prog.setFirstStepsIntroShown(st.firstStepsIntroShown);
             }
             return prog;
         });
+    }
+
+    public boolean jumpPlayerToSection(UUID uuid, String sectionId) {
+        if (sectionId == null) return false;
+        int targetIndex = -1;
+        for (int i = 0; i < allEntries.size(); i++) {
+            ProgressEntry e = allEntries.get(i);
+            if (e.getSectionId().equalsIgnoreCase(sectionId)) {
+                targetIndex = i;
+                break;
+            }
+        }
+        if (targetIndex < 0) return false;
+
+        PlayerProgress prog = getOrCreateProgress(uuid);
+        prog.setProgressIndex(targetIndex);
+        return true;
+    }
+
+    public boolean jumpPlayerToEntry(UUID uuid, String entryId) {
+        if (entryId == null) return false;
+        int targetIndex = -1;
+        for (int i = 0; i < allEntries.size(); i++) {
+            ProgressEntry e = allEntries.get(i);
+            if (e.getId().equalsIgnoreCase(entryId)) {
+                targetIndex = i;
+                break;
+            }
+        }
+        if (targetIndex < 0) return false;
+
+        PlayerProgress prog = getOrCreateProgress(uuid);
+        prog.setProgressIndex(targetIndex);
+        return true;
+    }
+
+    public void setPlayerSpeed(UUID uuid, double multiplier) {
+        PlayerProgress prog = getOrCreateProgress(uuid);
+        prog.setAdminSpeedMultiplier(multiplier);
+        prog.updateBossBar();
     }
     
 
@@ -363,14 +419,14 @@ public class ProgressManager implements Listener {
         lastActivity.put(uuid, System.currentTimeMillis());
     }
 
-    public void tickPlayer(Player player, int seconds) {
+    public void tickPlayer(Player player) {
         UUID uuid = player.getUniqueId();
         Long last = lastActivity.get(uuid);
         if (last == null) return;
         if (System.currentTimeMillis() - last > 2 * 60 * 1000L) return;
 
         PlayerProgress prog = getOrCreateProgress(uuid);
-        prog.tick(seconds);
+        prog.tick(1.0 * globalSpeedMultiplier);
     }
 
     // ------------------------------------------------------------------------
