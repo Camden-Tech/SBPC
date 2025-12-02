@@ -306,6 +306,12 @@ progression:
           material: STONE_AXE
           seconds: 300
 
+        pvp_unlock:
+          name: "PVP Unlock"
+          type: CUSTOM_ITEM
+          custom-key: pvp_unlock
+          seconds: 300
+
         chain_helmet:
           name: "Chainmail Helmet"
           type: ITEM
