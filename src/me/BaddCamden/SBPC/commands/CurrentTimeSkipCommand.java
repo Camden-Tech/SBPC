@@ -23,7 +23,7 @@ public class CurrentTimeSkipCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players can use this command.");
-            return true;
+            return false;
         }
         Player player = (Player) sender;
         plugin.getProgressManager().sendCurrentTimeSkipInfo(player);
