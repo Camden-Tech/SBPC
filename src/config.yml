@@ -3,26 +3,26 @@ session:
 
 
 messages:
-  server-closed-join: "&cThe server is currently closed. There is currently no active session."
+  server-closed-join: "§cThe server is currently closed. There is currently no active session."
 
-  item-unlocked: "&aUnlocked: &e{item}"
-  new-section-title: "&6You have reached a new section: &e{section}"
-  new-section-reset: "&7Your progress speed has been reset."
-  new-section-collect: "&7Collect related materials to speed up this section."
-  related-bonus: "&aYou have collected {material}. This section skips {seconds} seconds and speeds up by {percent}% each time!"
-  locked-section: "&cYou have not unlocked the section &e{section}&c yet. You can still collect these blocks, but you will not receive any time benefits for doing so."
-  all-sections-complete: "&aYou have completed all progression sections."
-  current-section-header: "&6Current section: &e{section}"
-  current-section-related-header: "&7Related materials:"
-  current-section-related-entry: " &8- &b{material}"
-  current-section-special: "&dSPECIAL: &f{special}"
-  current-section-no-special: "&dNo special criteria configured for this section."
-  cannot-use-item: "&cYou have not unlocked that item or its enchantments yet."
-  enchant-cancelled: "&cYou have not unlocked any of the enchantments rolled; enchantment cancelled."
-  first-steps-intro: "&aSection &e{section} &ahas begun! Chop down trees to speed up the timer's progress!"
-  section-unlock-broadcast: "&e{player} &7has unlocked the {section-colored}&7 section!"
-  bossbar-active: "&e{entry}&7 - &b{seconds}s remaining"
-  bossbar-complete: "&aAll progression unlocked!"
+  item-unlocked: "§aUnlocked: §e{item}"
+  new-section-title: "§6You have reached a new section: §e{section}"
+  new-section-reset: "§7Your progress speed has been reset."
+  new-section-collect: "§7Collect related materials to speed up this section."
+  related-bonus: "§aYou have collected {material}. This section skips {seconds} seconds and speeds up by {percent}% each time!"
+  locked-section: "§cYou have not unlocked the section §e{section}§c yet. You can still collect these blocks, but you will not receive any time benefits for doing so."
+  all-sections-complete: "§aYou have completed all progression sections."
+  current-section-header: "§6Current section: §e{section}"
+  current-section-related-header: "§7Related materials:"
+  current-section-related-entry: " §8- §b{material}"
+  current-section-special: "§dSPECIAL: §f{special}"
+  current-section-no-special: "§dNo special criteria configured for this section."
+  cannot-use-item: "§cYou have not unlocked that item or its enchantments yet."
+  enchant-cancelled: "§cYou have not unlocked any of the enchantments rolled; enchantment cancelled."
+  first-steps-intro: "§aSection §e{section} §ahas begun! Chop down trees to speed up the timer's progress!"
+  section-unlock-broadcast: "§e{player} §7has unlocked the {section-colored}§7 section!"
+  bossbar-active: "§e{entry}§7 - §b{seconds}s remaining"
+  bossbar-complete: "§aAll progression unlocked!"
 
 
 progression:
@@ -33,8 +33,8 @@ progression:
   sections:
     first_steps:
       display-name: "First Steps"
-      color: "&a"
       broadcast-unlock: true
+      color: "§a"
       related-materials:
         - OAK_LOG
         - SPRUCE_LOG
@@ -58,8 +58,8 @@ progression:
 
     wood_leather:
       display-name: "Wood Tools + Leather Armor"
-      color: "&6"
       broadcast-unlock: true
+      color: "§6"
       related-materials:
         - OAK_LOG
         - SPRUCE_LOG
@@ -132,8 +132,8 @@ progression:
 
     wheat_seeds:
       display-name: "Wheat Seeds"
-      color: "&2"
       broadcast-unlock: true
+      color: "§2"
       related-materials:
         - WHEAT_SEEDS
       special-info: "Having Wheat (even if not obtained naturally) auto completes this section."
@@ -147,8 +147,8 @@ progression:
 
     meats:
       display-name: "Meats"
-      color: "&c"
       broadcast-unlock: true
+      color: "§c"
       related-materials:
         - BEEF
         - COOKED_BEEF
@@ -253,8 +253,8 @@ progression:
 
     stone_chainmail:
       display-name: "Stone Tools + Chainmail Armor"
-      color: "&8"
       broadcast-unlock: true
+      color: "§8"
       related-materials:
         - COBBLESTONE
         - COBBLED_DEEPSLATE
@@ -330,7 +330,7 @@ progression:
 
     shield_bucket_fns:
       display-name: "Shield + Bucket + Flint and Steel"
-      color: "&9"
+      color: "§9"
       related-materials:
         - FLINT
         - RAW_IRON
@@ -363,7 +363,7 @@ progression:
 
     armor_padding:
       display-name: "Armor Padding"
-      color: "&f"
+      color: "§f"
       related-materials:
         - WHITE_WOOL
         - STRING
@@ -378,7 +378,7 @@ progression:
 
     enchants_tier1:
       display-name: "Early Enchants Tier I"
-      color: "&d"
+      color: "§d"
       related-materials:
         - SUGAR_CANE
         - LEATHER
@@ -501,7 +501,7 @@ progression:
     housing:
       display-name: "Housing"
       type: "NORMAL"
-      color: "&b"
+      color: "§b"
       special-info: ""          # no special
       related-materials: []     # intentionally empty – we use custom hooks instead
       entries:
@@ -513,7 +513,7 @@ progression:
 
     copper_tools_armor:
       display-name: "Copper Tools + Copper Armor"
-      color: "&e"
+      color: "§e"
       related-materials:
         - RAW_COPPER
       special-info: "Having a Redstone Lamp (even if not obtained naturally) auto completes this entire section."
@@ -575,7 +575,7 @@ progression:
 
     bows_crossbows_fishing_cobwebs:
       display-name: "Crossbow + Bow + Fishing Rod + Cobwebs"
-      color: "&5"
+      color: "§5"
       related-materials:
         - STRING
       special-info: "Having a Scaffolding (even if not obtained naturally) adds 800% to the progress speed for this section."
@@ -607,7 +607,7 @@ progression:
 
     enchants_tier2:
       display-name: "Mid Enchants Tier II"
-      color: "&3"
+      color: "§3"
       related-materials:
         - SUGAR_CANE
         - LEATHER
@@ -758,7 +758,7 @@ progression:
 
     tnt_fireworks:
       display-name: "TNT + Fireworks + TNT Minecart + End Crystal"
-      color: "&4"
+      color: "§4"
       related-materials:
         - GUNPOWDER
         - RAW_IRON
@@ -793,7 +793,7 @@ progression:
     farming:
       display-name: "Farming"
       type: "SPECIAL"           # it has a special: craft a cake
-      color: "&a"
+      color: "§a"
       special-info: "Craft a cake to trigger the special."
       related-materials: []     # sped up only by custom logic, not config materials
       entries:
@@ -805,7 +805,7 @@ progression:
 
     iron_tools_armor:
       display-name: "Iron Tools + Iron Armor"
-      color: "&7"
+      color: "§7"
       related-materials:
         - RAW_IRON
       special-info: "Having a Netherite Scrap (even if not obtained naturally) auto completes this entire section."
@@ -867,7 +867,7 @@ progression:
 
     blaze_powder:
       display-name: "Blaze Powder"
-      color: "&c"
+      color: "§c"
       related-materials:
         - BLAZE_ROD
       special-info: "Killing a Blaze speeds this progress by 10000% and skips 1 hour; picking up a Wither Skeleton Skull auto completes it. Additional time reduction: killing Blazes or Wither Skeletons."
@@ -881,7 +881,7 @@ progression:
 
     enderpearl_wind_charge:
       display-name: "Enderpearl + Wind Charge"
-      color: "&3"
+      color: "§3"
       related-materials:
         - ENDER_PEARL
         - BREEZE_ROD
@@ -902,7 +902,7 @@ progression:
 
     heart_meds:
       display-name: "Heart Meds"
-      color: "&c"
+      color: "§c"
       related-materials:
         - GHAST_TEAR
         - GOLDEN_APPLE
@@ -917,7 +917,7 @@ progression:
 
     enchants_tier3:
       display-name: "Higher Enchants Tier III"
-      color: "&1"
+      color: "§1"
       related-materials:
         - SUGAR_CANE
         - LEATHER
@@ -1075,7 +1075,7 @@ progression:
 
     shulker_shell:
       display-name: "Shulker Shell"
-      color: "&5"
+      color: "§5"
       related-materials:
         - CHORUS_FRUIT
         - SHULKER_SHELL
@@ -1090,7 +1090,7 @@ progression:
 
     diamond_tools_armor:
       display-name: "Diamond Tools + Diamond Armor"
-      color: "&b"
+      color: "§b"
       related-materials:
         - DIAMOND
       special-info: "Having a Netherite Block (even if not obtained naturally) adds 800% to the progress speed for this section."
@@ -1152,7 +1152,7 @@ progression:
 
     elytra:
       display-name: "Elytra"
-      color: "&f"
+      color: "§f"
       related-materials:
         - PHANTOM_MEMBRANE
         - LEATHER
@@ -1168,7 +1168,7 @@ progression:
 
     enchants_tier4:
       display-name: "Top Enchants Tier IV"
-      color: "&6"
+      color: "§6"
       related-materials:
         - SUGAR_CANE
         - LEATHER
@@ -1403,7 +1403,7 @@ progression:
 
     netherite_tools_armor:
       display-name: "Netherite Tools + Netherite Armor"
-      color: "&5"
+      color: "§5"
       related-materials:
         - ANCIENT_DEBRIS
       special-info: "Having a Dragon Egg (even if not obtained naturally) adds 800% to the progress speed for this section."
