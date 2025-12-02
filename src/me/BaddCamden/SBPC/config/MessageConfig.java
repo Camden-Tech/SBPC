@@ -101,6 +101,6 @@ public class MessageConfig {
      */
     public static String colorize(String input) {
         if (input == null) return "";
-        return input.replace('&', '§');
+        return input.replace('&', 'ï¿½');
     }
 }
