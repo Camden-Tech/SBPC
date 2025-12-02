@@ -10,6 +10,7 @@ import me.BaddCamden.SBPC.commands.CurrentTimeSkipCommand;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -31,12 +32,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
-
-import me.BaddCamden.SessionLibrary.events.SessionEndEvent;
-import me.BaddCamden.SessionLibrary.events.SessionStartEvent;
-import me.BaddCamden.SessionLibrary.events.SessionTickEvent;
 import me.BaddCamden.SBPC.api.SbpcAPI;
 import me.BaddCamden.SBPC.progress.ProgressManager;
 
@@ -49,6 +47,8 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
     private BukkitTask tickTask;
 
     private ProgressManager progressManager;
+    private Listener sessionLibraryListener;
+    private boolean sessionLibraryIntegrationEnabled = false;
     private boolean sessionActive = false;
 
     public static SBPCPlugin getInstance() {
@@ -63,10 +63,10 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
-        loadConfigValues();
-
         this.progressManager = new ProgressManager(this);
         SbpcAPI.init(this.progressManager);
+
+        loadConfigValues();
 
         // NEW: register command executors and tab completers
         SbpcCommand sbpcCmd = new SbpcCommand(this);
@@ -95,6 +95,11 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         if (progressManager != null) {
             progressManager.saveAll();
             progressManager.clearBossBars();
+            HandlerList.unregisterAll(progressManager);
+        }
+        HandlerList.unregisterAll(this);
+        if (sessionLibraryListener != null) {
+            HandlerList.unregisterAll(sessionLibraryListener);
         }
         instance = null;
     }
@@ -102,12 +107,76 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
     public void loadConfigValues() {
         FileConfiguration cfg = getConfig();
         MessageConfig.load(cfg);
+        double globalSpeed = cfg.getDouble("progression.global-speed-multiplier", 1.0);
+        progressManager.setGlobalSpeedMultiplier(globalSpeed);
+        configureSessionLibraryIntegration();
+    }
+
+    private void configureSessionLibraryIntegration() {
+        boolean integrationEnabledInConfig = getConfig().getBoolean("session.session-library-enabled", true);
+        Plugin sessionLib = Bukkit.getPluginManager().getPlugin("SessionLibrary");
+
+        boolean wasEnabled = sessionLibraryIntegrationEnabled;
+
+        if (!integrationEnabledInConfig) {
+            disableSessionLibraryIntegration("SessionLibrary integration disabled in config; sessions will always be active.", false);
+            return;
+        }
+
+        if (sessionLib == null) {
+            disableSessionLibraryIntegration("SessionLibrary plugin not found; running without session gating.", true);
+            return;
+        }
+
+        if (!isSessionLibraryClassesPresent()) {
+            disableSessionLibraryIntegration("SessionLibrary classes not available; running without session gating.", true);
+            return;
+        }
+
+        if (!sessionLibraryIntegrationEnabled) {
+            sessionLibraryListener = new SessionLibraryListener(this);
+            Bukkit.getPluginManager().registerEvents(sessionLibraryListener, this);
+            getLogger().info("SessionLibrary detected; session-based progression gating enabled.");
+        }
+
+        sessionLibraryIntegrationEnabled = true;
+        if (!wasEnabled) {
+            sessionActive = false;
+        }
+    }
+
+    private boolean isSessionLibraryClassesPresent() {
+        try {
+            Class.forName("me.BaddCamden.SessionLibrary.events.SessionStartEvent");
+            Class.forName("me.BaddCamden.SessionLibrary.events.SessionEndEvent");
+            Class.forName("me.BaddCamden.SessionLibrary.events.SessionTickEvent");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    private void disableSessionLibraryIntegration(String reason, boolean warn) {
+        if (sessionLibraryListener != null) {
+            HandlerList.unregisterAll(sessionLibraryListener);
+            sessionLibraryListener = null;
+        }
+        sessionLibraryIntegrationEnabled = false;
+        sessionActive = true;
+
+        if (reason != null && !reason.isEmpty()) {
+            if (warn) {
+                getLogger().warning(reason);
+            } else {
+                getLogger().info(reason);
+            }
+        }
     }
 
     private void tickPlayers() {
         if (!sessionActive) return;
         for (Player p : Bukkit.getOnlinePlayers()) {
-            progressManager.tickPlayer(p, 1);
+            progressManager.tickPlayer(p);
         }
     }
 
@@ -282,22 +351,19 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
     }
 
     // ------------------------------------------------------------------------
-    // SessionManager events
+    // SessionManager integration callbacks
     // ------------------------------------------------------------------------
 
-    @EventHandler
-    public void onSessionStart(SessionStartEvent event) {
+    void handleSessionStart() {
         sessionActive = true;
         getLogger().info("SessionManager session started – SBPC timers ticking while players are active.");
 
-        // NEW: when a session starts, show the First Steps intro for players
         for (Player p : Bukkit.getOnlinePlayers()) {
             progressManager.maybeShowFirstStepsIntro(p);
         }
     }
 
-    @EventHandler
-    public void onSessionEnd(SessionEndEvent event) {
+    void handleSessionEnd() {
         sessionActive = false;
         getLogger().info("SessionManager session ended – kicking all non-opped players.");
 
@@ -308,11 +374,8 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         }
     }
 
-
-    @EventHandler
-    public void onSessionTick(SessionTickEvent event) {
+    void handleSessionTick() {
         // Optional hook point
     }
 
- 
 }

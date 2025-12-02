@@ -28,6 +28,7 @@ public class PlayerProgress {
     private int currentIndex = 0;
     private int remainingSeconds;
     private double speedMultiplier = 1.0;
+    private double adminSpeedMultiplier = 1.0;
     private double timeAccumulator = 0.0;
 
     private final Set<String> unlockedEntries = new HashSet<>();
@@ -35,7 +36,7 @@ public class PlayerProgress {
     private final Set<String> benefitMessageSent = new HashSet<>();
 
     // Base per-player related-material bonus. The SBCPSpecials hook plugin
-    // can change these via SbpcAPI.setRelatedMaterialBonus(..) – this is
+    // can change these via SbpcAPI.setRelatedMaterialBonus(..) â€“ this is
     // where the "after Iron Pickaxe" behavior will be moved.
     private double relatedBonusPercentPerHit = 3.0;
     private int relatedBonusSkipSeconds = 10;
@@ -80,10 +81,22 @@ public class PlayerProgress {
         return remainingSeconds;
     }
 
+    public double getAdminSpeedMultiplier() {
+        return adminSpeedMultiplier;
+    }
+
+    public void setAdminSpeedMultiplier(double adminSpeedMultiplier) {
+        if (adminSpeedMultiplier < 0) {
+            adminSpeedMultiplier = 0;
+        }
+        this.adminSpeedMultiplier = adminSpeedMultiplier;
+    }
+
 
     public void loadState(int savedIndex,
                           int savedRemaining,
-                          Set<String> unlocked) {
+                          Set<String> unlocked,
+                          double savedAdminSpeedMultiplier) {
         unlockedEntries.clear();
         if (unlocked != null) {
             unlockedEntries.addAll(unlocked);
@@ -104,6 +117,10 @@ public class PlayerProgress {
             } else {
                 this.remainingSeconds = savedRemaining;
             }
+        }
+
+        if (savedAdminSpeedMultiplier > 0) {
+            this.adminSpeedMultiplier = savedAdminSpeedMultiplier;
         }
     }
 
@@ -194,6 +211,45 @@ public class PlayerProgress {
         this.speedMultiplier = 1.0; // clean slate for the new section
 
         updateBossBar();
+    }
+
+    /**
+     * Forcefully set the active entry index while keeping chronology consistent.
+     * Earlier entries become unlocked; later entries become locked again.
+     */
+    public void setProgressIndex(int targetIndex) {
+        if (targetIndex < 0) {
+            targetIndex = 0;
+        }
+        if (targetIndex > allEntries.size()) {
+            targetIndex = allEntries.size();
+        }
+
+        unlockedEntries.clear();
+        for (int i = 0; i < targetIndex && i < allEntries.size(); i++) {
+            unlockedEntries.add(allEntries.get(i).getId());
+        }
+
+        currentIndex = targetIndex;
+        timeAccumulator = 0.0;
+        speedMultiplier = 1.0;
+
+        if (currentIndex >= allEntries.size()) {
+            remainingSeconds = 0;
+            updateBossBarComplete();
+        } else {
+            remainingSeconds = allEntries.get(currentIndex).getBaseSeconds();
+            updateBossBar();
+        }
+
+        // Avoid re-sending locked-section spam on new path
+        notifiedLockedSections.clear();
+        benefitMessageSent.clear();
+
+        // Don't re-show the intro once admins have repositioned progress
+        if (currentIndex > 0) {
+            firstStepsIntroShown = true;
+        }
     }
 
     public boolean isEntryUnlocked(ProgressEntry entry) {
@@ -312,7 +368,7 @@ public class PlayerProgress {
     // Core ticking
     // ------------------------------------------------------------------------
 
-    public void tick(int seconds) {
+    public void tick(double seconds) {
         ProgressEntry entry = getCurrentEntry();
         if (entry == null) {
             updateBossBarComplete();
@@ -320,7 +376,7 @@ public class PlayerProgress {
         }
 
         // Accumulate fractional speed instead of rounding each tick
-        double amount = seconds * speedMultiplier;
+        double amount = seconds * adminSpeedMultiplier * speedMultiplier;
         timeAccumulator += amount;
 
         int whole = (int) Math.floor(timeAccumulator);
@@ -424,7 +480,7 @@ public class PlayerProgress {
 
         if (!benefitMessageSent.contains(sectionId)) {
             benefitMessageSent.add(sectionId);
-            player.sendMessage("§aYou have collected " + materialName +
+            player.sendMessage("Â§aYou have collected " + materialName +
                     ". This section skips " + skipSeconds +
                     " seconds and speeds up by " + bonusPercent + "% each time!");
         }
@@ -447,8 +503,8 @@ public class PlayerProgress {
 
         Player player = Bukkit.getPlayer(uuid);
         if (player != null && sourceDescription != null && !sourceDescription.isEmpty()) {
-            /*player.sendMessage("§aYour progression in §e" + sec.getDisplayName()
-                    + "§a advanced due to: §f" + sourceDescription); too spammy */
+            /*player.sendMessage("Â§aYour progression in Â§e" + sec.getDisplayName()
+                    + "Â§a advanced due to: Â§f" + sourceDescription); too spammy */
         }
     }
 
