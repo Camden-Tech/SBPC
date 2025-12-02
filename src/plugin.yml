@@ -5,7 +5,7 @@ api-version: 1.21
 author: BaddCamden
 description: Session Based Progression Cap using SessionManager
 
-depend:
+softdepend:
   - SessionLibrary
 
 commands:
