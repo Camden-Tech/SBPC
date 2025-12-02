@@ -1,12 +1,6 @@
 package me.BaddCamden.SBPC;
 
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
@@ -14,12 +8,7 @@ import me.BaddCamden.SBPC.commands.SbpcCommand;
 import me.BaddCamden.SBPC.config.MessageConfig;
 import me.BaddCamden.SBPC.commands.CurrentTimeSkipCommand;
 
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -35,7 +24,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -46,7 +34,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
-import me.BaddCamden.SessionLibrary.SessionManager;
 import me.BaddCamden.SessionLibrary.events.SessionEndEvent;
 import me.BaddCamden.SessionLibrary.events.SessionStartEvent;
 import me.BaddCamden.SessionLibrary.events.SessionTickEvent;
@@ -59,16 +46,10 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
 
     private static SBPCPlugin instance;
 
-    private DayOfWeek sessionDay;
-    private LocalTime sessionStart;
-    private LocalTime sessionEnd;
-    private ZoneId sessionZone;
-
-    private boolean windowOpen = false;
-    private BukkitTask windowTask;
     private BukkitTask tickTask;
 
     private ProgressManager progressManager;
+    private boolean sessionActive = false;
 
     public static SBPCPlugin getInstance() {
         return instance;
@@ -103,7 +84,6 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(this, this);
         Bukkit.getPluginManager().registerEvents(progressManager, this);
 
-        windowTask = Bukkit.getScheduler().runTaskTimer(this, this::checkSessionWindow, 20L, 20L * 20);
         tickTask = Bukkit.getScheduler().runTaskTimer(this, this::tickPlayers, 20L, 20L);
 
         getLogger().info("SBPC enabled.");
@@ -111,7 +91,6 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        if (windowTask != null) windowTask.cancel();
         if (tickTask != null) tickTask.cancel();
         if (progressManager != null) {
             progressManager.saveAll();
@@ -122,100 +101,18 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
 
     public void loadConfigValues() {
         FileConfiguration cfg = getConfig();
-        String day = cfg.getString("session.window-day", "WEDNESDAY").toUpperCase();
-        String start = cfg.getString("session.start-time", "19:00");
-        String end = cfg.getString("session.end-time", "22:00");
-        String zone = cfg.getString("session.timezone", "America/Chicago");
-
-        try {
-            sessionDay = DayOfWeek.valueOf(day);
-        } catch (IllegalArgumentException ex) {
-            sessionDay = DayOfWeek.WEDNESDAY;
-        }
-
-        sessionStart = LocalTime.parse(start);
-        sessionEnd = LocalTime.parse(end);
-        sessionZone = ZoneId.of(zone);
         MessageConfig.load(cfg);
     }
 
-
-    // ------------------------------------------------------------------------
-    // Session window & SessionManager integration
-    // ------------------------------------------------------------------------
-
-    private void checkSessionWindow() {
-        ZonedDateTime now = ZonedDateTime.now(sessionZone);
-        boolean inWindow = isWithinWindow(now);
-
-        if (inWindow && !windowOpen) {
-            windowOpen = true;
-            getLogger().info("SBPC session window opened.");
-
-            // Auto-start a SessionManager session for this window if one isn't already running
-            if (!SessionManager.hasActiveSession()) {
-                // Compute session length as exact difference between configured start and end times
-                ZonedDateTime windowStart = now
-                        .withHour(sessionStart.getHour())
-                        .withMinute(sessionStart.getMinute())
-                        .withSecond(sessionStart.getSecond())
-                        .withNano(0);
-
-                ZonedDateTime windowEnd = now
-                        .withHour(sessionEnd.getHour())
-                        .withMinute(sessionEnd.getMinute())
-                        .withSecond(sessionEnd.getSecond())
-                        .withNano(0);
-
-                // If end is not after start, treat it as next day (handles windows that cross midnight)
-                if (!windowEnd.isAfter(windowStart)) {
-                    windowEnd = windowEnd.plusDays(1);
-                }
-
-                long durationSeconds = java.time.Duration.between(windowStart, windowEnd).getSeconds();
-                int duration = (int) Math.max(1L, durationSeconds);
-
-                try {
-                    SessionManager.startNewSession(duration, true);
-                } catch (Throwable t) {
-                    getLogger().warning("Could not start SessionManager session: " + t.getMessage());
-                }
-            }
-        } else if (!inWindow && windowOpen) {
-            windowOpen = false;
-            getLogger().info("SBPC session window closed.");
-            // When the window closes, end any active session
-            if (SessionManager.hasActiveSession()) {
-                SessionManager.endSession();
-            }
-        }
-    }
-
-
-
-    private boolean isWithinWindow(ZonedDateTime now) {
-        if (now.getDayOfWeek() != sessionDay) return false;
-        LocalTime t = now.toLocalTime();
-        if (sessionEnd.isAfter(sessionStart)) {
-            return !t.isBefore(sessionStart) && t.isBefore(sessionEnd);
-        } else {
-            return !t.isBefore(sessionStart) || t.isBefore(sessionEnd);
-        }
-    }
-
-    private boolean isWithinWindowNow() {
-        return isWithinWindow(ZonedDateTime.now(sessionZone));
-    }
-
     private void tickPlayers() {
-        if (!SessionManager.hasActiveSession()) return;
+        if (!sessionActive) return;
         for (Player p : Bukkit.getOnlinePlayers()) {
             progressManager.tickPlayer(p, 1);
         }
     }
 
     // ------------------------------------------------------------------------
-    // Join blocking when ìclosedî
+    // Join blocking when ‚Äúclosed‚Äù
     // ------------------------------------------------------------------------
 
     @EventHandler
@@ -227,8 +124,8 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        // Players who are not opped cannot join unless a SessionManager session has started
-        if (!SessionManager.hasActiveSession() && !player.isOp()) {
+        // Players who are not opped cannot join unless a session has started
+        if (!sessionActive && !player.isOp()) {
             player.kickPlayer(MessageConfig.get("server-closed-join"));
             return;
         }
@@ -259,7 +156,7 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         // You cannot break blocks with disallowed items
         if (!progressManager.canUseItem(player, inHand)) {
             event.setCancelled(true);
-            player.sendMessage("ßcYou have not unlocked that item yet.");
+            player.sendMessage("¬ßcYou have not unlocked that item yet.");
             return;
         }
 
@@ -282,11 +179,11 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         // You cannot place blocks with disallowed items/blocks
         if (!progressManager.canUseItem(player, inHand)) {
             event.setCancelled(true);
-            player.sendMessage("ßcYou have not unlocked that item yet.");
+            player.sendMessage("¬ßcYou have not unlocked that item yet.");
             return;
         }
 
-        // Mark block as player-placed so it doesn't count as ìnaturalî
+        // Mark block as player-placed so it doesn't count as ‚Äúnatural‚Äù
         event.getBlockPlaced().setMetadata(BLOCK_PLACED_META, new FixedMetadataValue(this, true));
     }
     @EventHandler
@@ -299,7 +196,7 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         if (!progressManager.canUseItem(player, stack)) {
             event.setCancelled(true);
             // Optional message: comment out if too spammy
-            // player.sendMessage("ßcYou cannot pick up that item yet.");
+            // player.sendMessage("¬ßcYou cannot pick up that item yet.");
         }
     }
 
@@ -309,7 +206,7 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         ItemStack bucket = event.getItemStack();
         if (!progressManager.canUseItem(player, bucket)) {
             event.setCancelled(true);
-            player.sendMessage("ßcYou have not unlocked that bucket yet.");
+            player.sendMessage("¬ßcYou have not unlocked that bucket yet.");
         }
     }
 
@@ -319,7 +216,7 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         ItemStack bucket = event.getItemStack();
         if (!progressManager.canUseItem(player, bucket)) {
             event.setCancelled(true);
-            player.sendMessage("ßcYou have not unlocked that bucket yet.");
+            player.sendMessage("¬ßcYou have not unlocked that bucket yet.");
         }
     }
 
@@ -341,7 +238,7 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         // Disallowed items are not used at all (no block place, no shield raise, no item use)
         if (!progressManager.canUseItem(player, used)) {
             event.setCancelled(true);
-            player.sendMessage("ßcYou have not unlocked that item yet.");
+            player.sendMessage("¬ßcYou have not unlocked that item yet.");
         }
     }
 
@@ -390,7 +287,8 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onSessionStart(SessionStartEvent event) {
-        getLogger().info("SessionManager session started ñ SBPC timers ticking while players are active.");
+        sessionActive = true;
+        getLogger().info("SessionManager session started ‚Äì SBPC timers ticking while players are active.");
 
         // NEW: when a session starts, show the First Steps intro for players
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -400,7 +298,8 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onSessionEnd(SessionEndEvent event) {
-        getLogger().info("SessionManager session ended ñ kicking all non-opped players.");
+        sessionActive = false;
+        getLogger().info("SessionManager session ended ‚Äì kicking all non-opped players.");
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (!p.isOp()) {
