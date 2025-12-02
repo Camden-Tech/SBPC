@@ -97,7 +97,7 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
             progressManager.clearBossBars();
             HandlerList.unregisterAll(progressManager);
         }
-        HandlerList.unregisterAll(this);
+        HandlerList.unregisterAll((Plugin) this);
         if (sessionLibraryListener != null) {
             HandlerList.unregisterAll(sessionLibraryListener);
         }
