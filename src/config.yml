@@ -27,9 +27,13 @@ messages:
 
 progression:
   global-speed-multiplier: 1.0
+  related-bonus:
+    skip-seconds: 10
+    percent-speed-increase: 3.0
   sections:
     first_steps:
       display-name: "First Steps"
+      broadcast-unlock: true
       color: "§a"
       related-materials:
         - OAK_LOG
@@ -54,6 +58,7 @@ progression:
 
     wood_leather:
       display-name: "Wood Tools + Leather Armor"
+      broadcast-unlock: true
       color: "§6"
       related-materials:
         - OAK_LOG
@@ -127,6 +132,7 @@ progression:
 
     wheat_seeds:
       display-name: "Wheat Seeds"
+      broadcast-unlock: true
       color: "§2"
       related-materials:
         - WHEAT_SEEDS
@@ -141,6 +147,7 @@ progression:
 
     meats:
       display-name: "Meats"
+      broadcast-unlock: true
       color: "§c"
       related-materials:
         - BEEF
@@ -246,6 +253,7 @@ progression:
 
     stone_chainmail:
       display-name: "Stone Tools + Chainmail Armor"
+      broadcast-unlock: true
       color: "§8"
       related-materials:
         - COBBLESTONE
