@@ -540,7 +540,7 @@ progression:
       display-name: "Housing"
       type: "NORMAL"
       color: "§b"
-      special-info: ""          # no special
+      special-info: "Perform building tasks to speed up the timer."          # no special
       related-materials: []     # intentionally empty – we use custom hooks instead
       entries:
         build_infrastructure:
@@ -837,7 +837,7 @@ progression:
       display-name: "Farming"
       type: "SPECIAL"           # it has a special: craft a cake
       color: "§a"
-      special-info: "Craft a cake to trigger the special."
+      special-info: "Performing farming tasks speeds up this special. Craft a cake to auto complete."
       related-materials: []     # sped up only by custom logic, not config materials
       entries:
         farming_progress:

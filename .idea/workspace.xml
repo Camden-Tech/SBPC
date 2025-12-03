@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="07828e08-aa43-4a7f-9921-a3f9b6324fde" name="Changes" comment="Fixed ambigious this (between listener or plugin)">
+    <list default="true" id="07828e08-aa43-4a7f-9921-a3f9b6324fde" name="Changes" comment="Changed weird &amp; vs § behaviour with chat colors">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/config.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/BaddCamden/SBPC/api/SbpcAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/me/BaddCamden/SBPC/api/SbpcAPI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/BaddCamden/SBPC/config/MessageConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/me/BaddCamden/SBPC/config/MessageConfig.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,19 +36,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Maven.SBPC [install].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/camde/eclipse-workspace/SBPCLifesteal",
-    "settings.editor.selected.configurable": "File.Encoding"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Maven.SBPC [install].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/camde/eclipse-workspace/SBPCLifesteal&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;File.Encoding&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\camde\eclipse-workspace\SBPC\src" />
@@ -73,11 +71,20 @@
       <option name="project" value="LOCAL" />
       <updated>1764651162415</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Changed weird &amp; vs § behaviour with chat colors">
+      <option name="closed" value="true" />
+      <created>1764653695789</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1764653695789</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Fixed ambigious this (between listener or plugin)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed ambigious this (between listener or plugin)" />
+    <MESSAGE value="Changed weird &amp; vs § behaviour with chat colors" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed weird &amp; vs § behaviour with chat colors" />
   </component>
 </project>
