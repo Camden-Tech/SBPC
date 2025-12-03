@@ -116,12 +116,87 @@ public final class SbpcAPI {
     }
 
     /**
+     * Apply a global external time skip and speed change to every player.
+     * The values compound with per-player and global defaults.
+     */
+    public static void applyGlobalTimeSkip(int skipSeconds, double percentSpeedIncrease, String sourceDescription) {
+        if (manager == null) return;
+        manager.applyGlobalTimeSkip(skipSeconds, percentSpeedIncrease, sourceDescription);
+    }
+
+    /**
+     * Configure the default time skip/percent applied to every global skip request.
+     */
+    public static void setGlobalTimeSkipDefaults(int skipSeconds, double percentSpeedIncrease) {
+        if (manager == null) return;
+        manager.setGlobalTimeSkipDefaults(skipSeconds, percentSpeedIncrease);
+    }
+
+    /**
      * Apply an external time skip and speed bonus to the player's current entry.
      * This is the generic hook for "additional time reducing events".
      */
     public static void applyExternalTimeSkip(UUID uuid, int skipSeconds, double percentSpeedIncrease, String sourceDescription) {
         if (manager == null) return;
         manager.applyExternalTimeSkip(uuid, skipSeconds, percentSpeedIncrease, sourceDescription);
+    }
+
+    /**
+     * Adjust the global timer speed multiplier. This compounds with any per-player multipliers.
+     */
+    public static void setGlobalTimerSpeed(double multiplier) {
+        if (manager == null) return;
+        manager.setGlobalSpeedMultiplier(multiplier);
+    }
+
+    /**
+     * Add a globally unlocked entry. Any player that reaches (or is currently at) this entry
+     * will automatically skip it.
+     */
+    public static void addGlobalEntryUnlock(String entryId) {
+        if (manager == null) return;
+        manager.addGlobalEntryUnlock(entryId);
+    }
+
+    /**
+     * Add a globally unlocked section. Any player that reaches (or is currently in) this section
+     * will automatically complete it.
+     */
+    public static void addGlobalSectionUnlock(String sectionId) {
+        if (manager == null) return;
+        manager.addGlobalSectionUnlock(sectionId);
+    }
+
+    /**
+     * Clear all globally configured unlock overrides.
+     */
+    public static void clearGlobalUnlocks() {
+        if (manager == null) return;
+        manager.clearGlobalUnlocks();
+    }
+
+    /**
+     * Stop the global timer and remove boss bars for all players.
+     */
+    public static void stopGlobalTimer() {
+        if (manager == null) return;
+        manager.stopAllTimers();
+    }
+
+    /**
+     * Resume the global timer and restore boss bars for all players.
+     */
+    public static void startGlobalTimer() {
+        if (manager == null) return;
+        manager.startAllTimers();
+    }
+
+    /**
+     * Returns true when the global timer is paused.
+     */
+    public static boolean isGlobalTimerPaused() {
+        if (manager == null) return false;
+        return manager.isTimerPaused();
     }
 
     /**
