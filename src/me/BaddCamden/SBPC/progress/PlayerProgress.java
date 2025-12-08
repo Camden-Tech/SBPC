@@ -253,7 +253,10 @@ public class PlayerProgress {
     }
 
     public boolean isEntryUnlocked(ProgressEntry entry) {
-        return unlockedEntries.contains(entry.getId());
+        if (entry == null) {
+            return false;
+        }
+        return isEntryUnlocked(entry.getId());
     }
 
     /**
@@ -315,20 +318,79 @@ public class PlayerProgress {
     }
 
     public boolean isSectionCompleted(String sectionId) {
-        boolean found = false;
+        if (sectionId == null || sectionId.isEmpty()) {
+            return false;
+        }
+
+        boolean hasEntries = false;
         for (ProgressEntry e : allEntries) {
-            if (e.getSectionId().equals(sectionId)) {
-                found = true;
+            if (sectionId.equalsIgnoreCase(e.getSectionId())) {
+                hasEntries = true;
                 if (!unlockedEntries.contains(e.getId())) {
                     return false;
                 }
             }
         }
-        // If the section has no entries in the progression list, treat as completed
-        return found;
+
+        if (hasEntries) {
+            return true;
+        }
+
+        // If the section exists but has no entries, consider it complete.
+        for (SectionDefinition definition : sections) {
+            if (sectionId.equalsIgnoreCase(definition.getId())) {
+                return definition.getEntries().isEmpty();
+            }
+        }
+
+        // Unknown section id
+        return false;
     }
     public boolean isEntryUnlocked(String entryId) {
+        if (entryId == null || entryId.isEmpty()) {
+            return false;
+        }
         return unlockedEntries.contains(entryId);
+    }
+
+    /**
+     * Returns true if the player's current entry matches the provided id.
+     */
+    public boolean isOnEntry(String entryId) {
+        if (entryId == null || entryId.isEmpty()) {
+            return false;
+        }
+        ProgressEntry current = getCurrentEntry();
+        return current != null && entryId.equals(current.getId());
+    }
+
+    public boolean isOnSection(String sectionId) {
+        return isOnSection(sectionId, false);
+    }
+
+    /**
+     * Checks whether the player is in (or has completed) the given section.
+     *
+     * @param sectionId        target section identifier
+     * @param includeCompleted when true, treat the final configured section as the
+     *                         player's current section once all entries are complete
+     */
+    public boolean isOnSection(String sectionId, boolean includeCompleted) {
+        if (sectionId == null || sectionId.isEmpty()) {
+            return false;
+        }
+
+        ProgressEntry current = getCurrentEntry();
+        if (current != null) {
+            return sectionId.equals(current.getSectionId());
+        }
+
+        if (includeCompleted && currentIndex >= allEntries.size() && !sections.isEmpty()) {
+            SectionDefinition lastSection = sections.get(sections.size() - 1);
+            return sectionId.equals(lastSection.getId());
+        }
+
+        return false;
     }
 
     /**
