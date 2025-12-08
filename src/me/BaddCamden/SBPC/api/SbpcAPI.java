@@ -58,6 +58,9 @@ public final class SbpcAPI {
      * Returns true if the progression entry with this id has been unlocked for the given player.
      */
     public static boolean isEntryUnlocked(UUID uuid, String entryId) {
+        if (manager == null || uuid == null || entryId == null || entryId.isEmpty()) {
+            return false;
+        }
         return getProgress(uuid).isEntryUnlocked(entryId);
     }
 
@@ -84,6 +87,34 @@ public final class SbpcAPI {
      */
     public static SectionDefinition getSection(String sectionId) {
         return requireManager().getSectionById(sectionId);
+    }
+
+    /**
+     * Returns true if the player is currently on the provided entry id.
+     */
+    public static boolean isOnEntry(UUID uuid, String entryId) {
+        if (manager == null || uuid == null || entryId == null || entryId.isEmpty()) {
+            return false;
+        }
+        return requireManager().getOrCreateProgress(uuid).isOnEntry(entryId);
+    }
+
+    /**
+     * Returns true if the player is currently in the given section.
+     */
+    public static boolean isOnSection(UUID uuid, String sectionId) {
+        return isOnSection(uuid, sectionId, false);
+    }
+
+    /**
+     * Checks if the player is in the given section, with an option to treat the last
+     * configured section as "current" once all entries are complete.
+     */
+    public static boolean isOnSection(UUID uuid, String sectionId, boolean includeCompleted) {
+        if (manager == null || uuid == null || sectionId == null || sectionId.isEmpty()) {
+            return false;
+        }
+        return requireManager().getOrCreateProgress(uuid).isOnSection(sectionId, includeCompleted);
     }
 
     /**
