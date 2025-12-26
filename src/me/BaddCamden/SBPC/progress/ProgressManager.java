@@ -40,6 +40,9 @@ import me.BaddCamden.SBPC.progress.ProgressEntry.EntryKind;
 import me.BaddCamden.SBPC.SBPCPlugin;
 import me.BaddCamden.SBPC.events.RelatedResourceTimeSkipEvent;
 
+/**
+ * Coordinates player progression state, persistence, boss bars, and item gating logic.
+ */
 public class ProgressManager implements Listener {
 
     private final SBPCPlugin plugin;
@@ -71,6 +74,9 @@ public class ProgressManager implements Listener {
     private final Map<UUID, SavedState> savedStates = new HashMap<>();
     private final File playersFolder;
     
+    /**
+     * Creates the progression manager tied to a specific plugin instance.
+     */
     public ProgressManager(SBPCPlugin plugin) {
         this.plugin = plugin;
         this.playersFolder = new File(plugin.getDataFolder(), "Players");
@@ -82,6 +88,9 @@ public class ProgressManager implements Listener {
     // Config + stored progress
     // ------------------------------------------------------------------------
 
+    /**
+     * Reads progression sections and entries from config, repopulating caches and restoring saved state.
+     */
     public void reloadFromConfig() {
         sections.clear();
         allEntries.clear();
@@ -220,6 +229,9 @@ public class ProgressManager implements Listener {
         }
     }
 
+    /**
+     * Loads persisted player progress snapshots from disk for reuse when players join.
+     */
     private void loadProgressFromDisk() {
         savedStates.clear();
 
@@ -271,6 +283,9 @@ public class ProgressManager implements Listener {
         }
     }
 
+    /**
+     * Writes all tracked player progress data to disk.
+     */
     public void saveAll() {
         if (!playersFolder.exists() && !playersFolder.mkdirs()) {
             plugin.getLogger().warning("Could not create Players data folder at " + playersFolder.getPath());
@@ -298,10 +313,16 @@ public class ProgressManager implements Listener {
         }
     }
 
+    /**
+     * Checks whether a custom entry with the given key is unlocked for the player.
+     */
     public boolean isCustomUnlocked(UUID uuid, String customKey) {
         return getOrCreateProgress(uuid).isCustomUnlocked(customKey);
     }
 
+    /**
+     * Returns the first configured custom entry matching the provided key.
+     */
     public ProgressEntry getFirstCustomEntry(String customKey) {
         if (customKey == null || customKey.isEmpty()) return null;
         String keyLower = customKey.toLowerCase();
@@ -316,6 +337,9 @@ public class ProgressManager implements Listener {
         return null;
     }
 
+    /**
+     * Finds a section definition by id, or null if none match.
+     */
     public SectionDefinition getSectionById(String sectionId) {
         if (sectionId == null) return null;
         for (SectionDefinition s : sections) {
@@ -331,18 +355,30 @@ public class ProgressManager implements Listener {
     // Player progress & bossbars
     // ------------------------------------------------------------------------
 
+    /**
+     * @return ordered list of all configured progression sections.
+     */
     public List<SectionDefinition> getSections() {
         return sections;
     }
 
+    /**
+     * @return flattened list of every progression entry across all sections.
+     */
     public List<ProgressEntry> getAllEntries() {
         return allEntries;
     }
 
+    /**
+     * @return the current global timer speed multiplier.
+     */
     public double getGlobalSpeedMultiplier() {
         return globalSpeedMultiplier;
     }
 
+    /**
+     * Adjusts the global timer speed multiplier, clamping to zero minimum.
+     */
     public void setGlobalSpeedMultiplier(double globalSpeedMultiplier) {
         if (globalSpeedMultiplier < 0) {
             globalSpeedMultiplier = 0;
@@ -350,6 +386,9 @@ public class ProgressManager implements Listener {
         this.globalSpeedMultiplier = globalSpeedMultiplier;
     }
 
+    /**
+     * Sets default skip/percent values applied to every global time skip request.
+     */
     public void setGlobalTimeSkipDefaults(int skipSeconds, double percentSpeedIncrease) {
         if (skipSeconds < 0) {
             skipSeconds = 0;
@@ -358,6 +397,9 @@ public class ProgressManager implements Listener {
         this.globalDefaultSpeedPercent = percentSpeedIncrease;
     }
 
+    /**
+     * Applies an external time skip and speed increase to all players.
+     */
     public void applyGlobalTimeSkip(int skipSeconds, double percentSpeedIncrease, String sourceDescription) {
         int effectiveSkip = skipSeconds + globalDefaultSkipSeconds;
         double effectiveSpeed = percentSpeedIncrease + globalDefaultSpeedPercent;
@@ -367,6 +409,9 @@ public class ProgressManager implements Listener {
         }
     }
 
+    /**
+     * Marks an entry as globally unlocked so every player skips it automatically.
+     */
     public void addGlobalEntryUnlock(String entryId) {
         if (entryId == null || entryId.isEmpty()) return;
         globallyUnlockedEntries.add(entryId.toLowerCase(Locale.ROOT));
@@ -375,6 +420,9 @@ public class ProgressManager implements Listener {
         }
     }
 
+    /**
+     * Marks a section as globally unlocked, auto-completing it for every player.
+     */
     public void addGlobalSectionUnlock(String sectionId) {
         if (sectionId == null || sectionId.isEmpty()) return;
         globallyUnlockedSections.add(sectionId.toLowerCase(Locale.ROOT));
@@ -383,11 +431,17 @@ public class ProgressManager implements Listener {
         }
     }
 
+    /**
+     * Removes all global unlock overrides for entries and sections.
+     */
     public void clearGlobalUnlocks() {
         globallyUnlockedEntries.clear();
         globallyUnlockedSections.clear();
     }
 
+    /**
+     * Sets the default related-material bonus applied to new PlayerProgress instances.
+     */
     public void setRelatedBonusDefaults(double bonusPercent, int skipSeconds) {
         if (bonusPercent < 0) {
             bonusPercent = 0;
@@ -404,6 +458,9 @@ public class ProgressManager implements Listener {
         }
     }
 
+    /**
+     * Returns a player's progression state, creating it (and boss bar) if missing.
+     */
     public PlayerProgress getOrCreateProgress(UUID uuid) {
         return progressMap.computeIfAbsent(uuid, u -> {
             BossBar bar = Bukkit.createBossBar("Progress", BarColor.BLUE, BarStyle.SOLID);
@@ -421,6 +478,9 @@ public class ProgressManager implements Listener {
         });
     }
 
+    /**
+     * Moves the player to the first entry of the specified section.
+     */
     public boolean jumpPlayerToSection(UUID uuid, String sectionId) {
         if (sectionId == null) return false;
         int targetIndex = -1;
@@ -438,6 +498,9 @@ public class ProgressManager implements Listener {
         return true;
     }
 
+    /**
+     * Moves the player directly to a specific entry by id.
+     */
     public boolean jumpPlayerToEntry(UUID uuid, String entryId) {
         if (entryId == null) return false;
         int targetIndex = -1;
@@ -455,17 +518,26 @@ public class ProgressManager implements Listener {
         return true;
     }
 
+    /**
+     * Sets a per-player admin speed multiplier.
+     */
     public void setPlayerSpeed(UUID uuid, double multiplier) {
         PlayerProgress prog = getOrCreateProgress(uuid);
         prog.setAdminSpeedMultiplier(multiplier);
         prog.updateBossBar();
     }
-    
 
+
+    /**
+     * Re-adds a player to their boss bar and refreshes its text/progress.
+     */
     public void ensureBossBar(Player player) {
         getOrCreateProgress(player.getUniqueId()).updateBossBar();
     }
 
+    /**
+     * Removes all boss bars from every tracked player.
+     */
     public void clearBossBars() {
         for (BossBar bar : bossBars.values()) {
             bar.removeAll();
@@ -473,6 +545,9 @@ public class ProgressManager implements Listener {
         bossBars.clear();
     }
 
+    /**
+     * Removes a single player's boss bar when they leave the server.
+     */
     public void removeBossBar(UUID uuid) {
         BossBar bar = bossBars.remove(uuid);
         if (bar != null) {
@@ -480,10 +555,16 @@ public class ProgressManager implements Listener {
         }
     }
 
+    /**
+     * Records a timestamp of player activity to control timer ticking.
+     */
     public void markActive(UUID uuid) {
         lastActivity.put(uuid, System.currentTimeMillis());
     }
 
+    /**
+     * Advances a player's progression timer if they have been active recently.
+     */
     public void tickPlayer(Player player) {
         UUID uuid = player.getUniqueId();
         Long last = lastActivity.get(uuid);
@@ -499,6 +580,9 @@ public class ProgressManager implements Listener {
         prog.tick(1.0 * globalSpeedMultiplier);
     }
 
+    /**
+     * Pauses all progression timers and hides boss bars.
+     */
     public void stopAllTimers() {
         timerPaused = true;
         for (BossBar bar : bossBars.values()) {
@@ -506,6 +590,9 @@ public class ProgressManager implements Listener {
         }
     }
 
+    /**
+     * Resumes timers and reattaches boss bars for online players.
+     */
     public void startAllTimers() {
         timerPaused = false;
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -513,10 +600,16 @@ public class ProgressManager implements Listener {
         }
     }
 
+    /**
+     * @return true when the global timer is currently paused.
+     */
     public boolean isTimerPaused() {
         return timerPaused;
     }
 
+    /**
+     * Pushes current global unlock overrides into a player's progress state.
+     */
     private void applyGlobalUnlocks(PlayerProgress prog) {
         prog.applyGlobalUnlocks(globallyUnlockedEntries, globallyUnlockedSections);
     }
@@ -524,6 +617,9 @@ public class ProgressManager implements Listener {
     // ------------------------------------------------------------------------
     // Related material handling
     // ------------------------------------------------------------------------
+    /**
+     * Removes disallowed armour/offhand items from a player's equipment slots.
+     */
     public void sanitizeEquipment(Player player) {
         PlayerInventory inv = player.getInventory();
 
@@ -565,6 +661,9 @@ public class ProgressManager implements Listener {
         }
     }
 
+    /**
+     * Attempts to place an item into the player's inventory, dropping any overflow.
+     */
     private void dropOrStore(Player player, ItemStack item) {
         HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(item);
         if (!leftovers.isEmpty()) {
@@ -575,6 +674,9 @@ public class ProgressManager implements Listener {
         }
     }
 
+    /**
+     * Applies related-material bonuses or warnings when a block is broken.
+     */
     public void handleRelatedBlockBroken(Player player, org.bukkit.block.Block block, boolean natural) {
         UUID uuid = player.getUniqueId();
         PlayerProgress prog = getOrCreateProgress(uuid);
@@ -667,6 +769,9 @@ public class ProgressManager implements Listener {
     // Usage / crafting / enchant gating
     // ------------------------------------------------------------------------
 
+    /**
+     * Shows the introductory message for the "first_steps" section once per player.
+     */
     public void maybeShowFirstStepsIntro(Player player) {
         UUID uuid = player.getUniqueId();
         PlayerProgress prog = getOrCreateProgress(uuid);
@@ -689,7 +794,10 @@ public class ProgressManager implements Listener {
         prog.setFirstStepsIntroShown(true);
     }
 
-    
+
+    /**
+     * Gold items are intentionally exempt from progression restrictions.
+     */
     private boolean isGoldItem(ItemStack item) {
         if (item == null) return false;
         Material m = item.getType();
@@ -697,6 +805,9 @@ public class ProgressManager implements Listener {
         return n.startsWith("GOLDEN_");
     }
 
+    /**
+     * Cancels craft results if the crafter has not unlocked the resulting item.
+     */
     public void handlePrepareCraft(PrepareItemCraftEvent event) {
         if (!(event.getInventory() instanceof CraftingInventory)) return;
         ItemStack result = event.getInventory().getResult();
@@ -712,6 +823,9 @@ public class ProgressManager implements Listener {
         }
     }
 
+    /**
+     * After any inventory click, sanitises the player's equipped items.
+     */
     public void handleInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) return;
         Player player = (Player) event.getWhoClicked();
@@ -721,6 +835,9 @@ public class ProgressManager implements Listener {
         Bukkit.getScheduler().runTask(plugin, () -> sanitizeEquipment(player));
     }
 
+    /**
+     * Checks whether the player can use/equip the given item based on unlocks.
+     */
     public boolean canUseItem(Player player, ItemStack item) {
         if (item == null) return true;
         if (item.getType() == Material.AIR) return true;
@@ -743,6 +860,9 @@ public class ProgressManager implements Listener {
         return true;
     }
 
+    /**
+     * Cancels melee attacks with disallowed items or enchantments.
+     */
     public void handleEntityDamage(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player)) return;
         Player player = (Player) event.getDamager();
@@ -756,6 +876,9 @@ public class ProgressManager implements Listener {
         }
     }
 
+    /**
+     * Filters enchantment table rolls to only allow unlocked enchantments/levels.
+     */
     public void handleEnchant(EnchantItemEvent event) {
         Player player = event.getEnchanter();
         ItemStack item = event.getItem();
@@ -792,6 +915,9 @@ public class ProgressManager implements Listener {
         }
     }
 
+    /**
+     * Strips disallowed enchantments from anvil outputs before the player takes them.
+     */
     public void handlePrepareAnvil(PrepareAnvilEvent event) {
         AnvilInventory inv = event.getInventory();
         ItemStack result = event.getResult();
@@ -833,6 +959,9 @@ public class ProgressManager implements Listener {
         event.setResult(result);
     }
 
+    /**
+     * Processes mob drops for related-material bonuses when a player kills an entity.
+     */
     public void handleEntityDeath(EntityDeathEvent event) {
         if (!(event.getEntity().getKiller() instanceof Player)) return;
         Player killer = event.getEntity().getKiller();
@@ -844,6 +973,9 @@ public class ProgressManager implements Listener {
         handleRelatedDropsFromMob(killer, drops);
     }
 
+    /**
+     * Applies related-material logic for items dropped by killed mobs.
+     */
     private void handleRelatedDropsFromMob(Player player, Collection<ItemStack> drops) {
         UUID uuid = player.getUniqueId();
         PlayerProgress prog = getOrCreateProgress(uuid);
@@ -901,16 +1033,25 @@ public class ProgressManager implements Listener {
 
     // === API helpers for hook plugins (SBCPSpecials etc.) ===
 
+    /**
+     * Overrides the per-player related-material bonus values.
+     */
     public void setRelatedBonus(UUID uuid, double bonusPercent, int skipSeconds) {
         PlayerProgress prog = getOrCreateProgress(uuid);
         prog.setRelatedBonus(bonusPercent, skipSeconds);
     }
 
+    /**
+     * Applies an external time skip/speed increase to a single player's current entry.
+     */
     public void applyExternalTimeSkip(UUID uuid, int skipSeconds, double percentSpeedIncrease, String sourceDescription) {
         PlayerProgress prog = getOrCreateProgress(uuid);
         prog.applyExternalTimeSkip(skipSeconds, percentSpeedIncrease, sourceDescription);
     }
 
+    /**
+     * Forces the player's current section to be completed.
+     */
     public void completeCurrentSection(UUID uuid) {
         PlayerProgress prog = progressMap.get(uuid);
         if (prog != null) {
@@ -929,6 +1070,9 @@ public class ProgressManager implements Listener {
         return (sec != null) ? sec.getId() : null;
     }
 
+    /**
+     * Checks whether a given section is fully completed for the player.
+     */
     public boolean isSectionCompleted(UUID uuid, String sectionId) {
         PlayerProgress prog = progressMap.get(uuid);
         return prog != null && prog.isSectionCompleted(sectionId);
@@ -939,6 +1083,9 @@ public class ProgressManager implements Listener {
     // Info command
     // ------------------------------------------------------------------------
 
+    /**
+     * Sends the player a summary of their current section and related materials.
+     */
     public void sendCurrentTimeSkipInfo(Player player) {
         PlayerProgress prog = getOrCreateProgress(player.getUniqueId());
         SectionDefinition sec = prog.getCurrentSection();

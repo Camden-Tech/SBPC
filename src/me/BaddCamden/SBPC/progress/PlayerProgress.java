@@ -18,6 +18,9 @@ import me.BaddCamden.SBPC.progress.ProgressEntry.EntryKind;
 import me.BaddCamden.SBPC.events.NextSectionEvent;
 import me.BaddCamden.SBPC.events.UnlockItemEvent;
 
+/**
+ * Tracks a single player's progression state, timers, and unlocks.
+ */
 public class PlayerProgress {
 
     private final UUID uuid;
@@ -45,6 +48,9 @@ public class PlayerProgress {
 
     
 
+    /**
+     * Creates a new PlayerProgress tied to a specific player and boss bar.
+     */
     public PlayerProgress(UUID uuid,
                           List<ProgressEntry> allEntries,
                           List<SectionDefinition> sections,
@@ -61,6 +67,9 @@ public class PlayerProgress {
         }
     }
 
+    /**
+     * @return player UUID this progress belongs to.
+     */
     public UUID getUuid() {
         return uuid;
     }
@@ -69,22 +78,37 @@ public class PlayerProgress {
     // Save/load state
     // ------------------------------------------------------------------------
 
+    /**
+     * @return copy of unlocked entry ids for persistence.
+     */
     public Set<String> getUnlockedEntryIds() {
         return new HashSet<>(unlockedEntries);
     }
 
+    /**
+     * @return index of the current progression entry (0-based).
+     */
     public int getCurrentIndex() {
         return currentIndex;
     }
 
+    /**
+     * @return remaining seconds on the active entry timer.
+     */
     public int getRemainingSeconds() {
         return remainingSeconds;
     }
 
+    /**
+     * @return admin-applied speed multiplier for this player.
+     */
     public double getAdminSpeedMultiplier() {
         return adminSpeedMultiplier;
     }
 
+    /**
+     * Overrides the admin speed multiplier; clamps to zero minimum.
+     */
     public void setAdminSpeedMultiplier(double adminSpeedMultiplier) {
         if (adminSpeedMultiplier < 0) {
             adminSpeedMultiplier = 0;
@@ -93,6 +117,9 @@ public class PlayerProgress {
     }
 
 
+    /**
+     * Restores saved progress data into this instance.
+     */
     public void loadState(int savedIndex,
                           int savedRemaining,
                           Set<String> unlocked,
@@ -302,11 +329,17 @@ public class PlayerProgress {
         return false;
     }
 
+    /**
+     * @return the active progression entry, or null if all entries are complete.
+     */
     public ProgressEntry getCurrentEntry() {
         if (currentIndex < 0 || currentIndex >= allEntries.size()) return null;
         return allEntries.get(currentIndex);
     }
 
+    /**
+     * @return the section associated with the current entry, or null if none.
+     */
     public SectionDefinition getCurrentSection() {
         ProgressEntry entry = getCurrentEntry();
         if (entry == null) return null;
@@ -317,6 +350,9 @@ public class PlayerProgress {
         return null;
     }
 
+    /**
+     * Checks whether every entry in the given section has been unlocked.
+     */
     public boolean isSectionCompleted(String sectionId) {
         if (sectionId == null || sectionId.isEmpty()) {
             return false;
@@ -413,18 +449,30 @@ public class PlayerProgress {
         return false;
     }
 
+    /**
+     * @return true if the player has unlocked at least one entry.
+     */
     public boolean hasAnyUnlocked() {
         return !unlockedEntries.isEmpty();
     }
 
+    /**
+     * @return whether the first_steps intro has already been displayed.
+     */
     public boolean isFirstStepsIntroShown() {
         return firstStepsIntroShown;
     }
 
+    /**
+     * Marks whether the intro message was shown to the player.
+     */
     public void setFirstStepsIntroShown(boolean value) {
         this.firstStepsIntroShown = value;
     }
 
+    /**
+     * Applies global unlock overrides and advances the player as needed.
+     */
     public void applyGlobalUnlocks(Set<String> entryIds, Set<String> sectionIds) {
         boolean changed = true;
         while (changed) {
@@ -447,6 +495,9 @@ public class PlayerProgress {
         }
     }
 
+    /**
+     * Utility to check case-insensitive membership in a set.
+     */
     private boolean containsIgnoreCase(Set<String> values, String needle) {
         if (values == null || needle == null) {
             return false;
@@ -464,6 +515,9 @@ public class PlayerProgress {
     // Core ticking
     // ------------------------------------------------------------------------
 
+    /**
+     * Advances the player's current entry timer by the given number of seconds.
+     */
     public void tick(double seconds) {
         ProgressEntry entry = getCurrentEntry();
         if (entry == null) {
@@ -495,6 +549,9 @@ public class PlayerProgress {
         updateBossBar();
     }
 
+    /**
+     * Instantly completes the current entry and moves to the next.
+     */
     public void skipCurrentEntry() {
         ProgressEntry entry = getCurrentEntry();
         if (entry == null) return;
@@ -502,6 +559,10 @@ public class PlayerProgress {
         timeAccumulator = 0.0;
         advanceToNextEntry();
     }
+
+    /**
+     * Marks the given entry as unlocked and fires the unlock event.
+     */
     private void unlockCurrentEntry(ProgressEntry entry) {
         unlockedEntries.add(entry.getId());
 
@@ -519,6 +580,9 @@ public class PlayerProgress {
 
 
 
+    /**
+     * Moves progression forward to the next entry, resetting timers and messages as needed.
+     */
     private void advanceToNextEntry() {
         ProgressEntry old = getCurrentEntry();
         currentIndex++;
@@ -572,6 +636,9 @@ public class PlayerProgress {
     // Bonuses
     // ------------------------------------------------------------------------
 
+    /**
+     * Applies the configured related-material speed/skip bonus for the active section.
+     */
     public void applyRelatedMaterialBonus(String sectionId, String materialName) {
         if (isSectionCompleted(sectionId)) return;
 
@@ -616,6 +683,9 @@ public class PlayerProgress {
         }
     }
 
+    /**
+     * Sends a one-time warning that a section is locked when interacting with its resources.
+     */
     public void notifyLockedSectionOnce(String sectionId, String sectionName) {
         if (notifiedLockedSections.contains(sectionId)) return;
         notifiedLockedSections.add(sectionId);
@@ -668,6 +738,9 @@ public class PlayerProgress {
     // BossBar
     // ------------------------------------------------------------------------
 
+    /**
+     * Updates the boss bar to reflect current entry progress.
+     */
     public void updateBossBar() {
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) return;
@@ -691,6 +764,9 @@ public class PlayerProgress {
 
     }
 
+    /**
+     * Shows the completed state on the boss bar when all entries are done.
+     */
     public void updateBossBarComplete() {
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) return;

@@ -22,15 +22,24 @@ import me.BaddCamden.SBPC.config.MessageConfig;
 import me.BaddCamden.SBPC.progress.ProgressEntry;
 import me.BaddCamden.SBPC.progress.SectionDefinition;
 
+/**
+ * Implements the administrative /sbpc command and its subcommands.
+ */
 public class SbpcCommand implements CommandExecutor, TabCompleter {
 
     private final SBPCPlugin plugin;
 
+    /**
+     * Creates the handler for /sbpc backed by the provided plugin instance.
+     */
     public SbpcCommand(SBPCPlugin plugin) {
         this.plugin = plugin;
     }
 
     @Override
+    /**
+     * Routes /sbpc subcommands to their handlers and enforces admin permission.
+     */
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("sbpc.admin")) {
             sender.sendMessage(MessageConfig.get("no-permission"));
@@ -59,6 +68,9 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
+    /**
+     * Supplies tab completion hints for /sbpc based on arguments and permissions.
+     */
     public List<String> onTabComplete(CommandSender sender,
                                       Command command,
                                       String alias,
@@ -129,6 +141,9 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         return Collections.emptyList();
     }
 
+    /**
+     * Reloads plugin configuration and progression definitions from disk.
+     */
     private void handleReload(CommandSender sender) {
         plugin.reloadConfig();
         plugin.getLogger().info("Reloading SBPC config and progression.");
@@ -139,6 +154,9 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(MessageConfig.get("config-reloaded"));
     }
 
+    /**
+     * Moves a player directly to a specific section or entry.
+     */
     private boolean handleJump(CommandSender sender, String[] args) {
         if (args.length < 4) {
             sender.sendMessage("§eUsage: /sbpc jump <section|entry> <player> <id>");
@@ -177,6 +195,9 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    /**
+     * Adjusts progression speed multipliers either globally or per-player.
+     */
     private boolean handleSpeed(CommandSender sender, String[] args) {
         if (args.length < 3) {
             sender.sendMessage("§eUsage: /sbpc speed <player|global> <target> <multiplier>");
@@ -227,6 +248,9 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         return false;
     }
 
+    /**
+     * Performs live configuration edits for sections or entries via command.
+     */
     private boolean handleConfig(CommandSender sender, String[] args) {
         if (args.length < 3) {
             sender.sendMessage("§eUsage: /sbpc config <section|entry> ...");
@@ -245,6 +269,9 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         return false;
     }
 
+    /**
+     * Handles /sbpc config section ... commands for modifying section properties.
+     */
     private boolean handleSectionConfig(CommandSender sender, String[] args) {
         if (args.length < 5) {
             sender.sendMessage("§eUsage: /sbpc config section <sectionId> <set|add-related|remove-related> ...");
@@ -313,6 +340,9 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    /**
+     * Handles /sbpc config entry ... commands for editing entry fields.
+     */
     private boolean handleEntryConfig(CommandSender sender, String[] args) {
         if (args.length < 6) {
             sender.sendMessage("§eUsage: /sbpc config entry <sectionId> <entryId> set <field> <value>");
@@ -385,6 +415,9 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    /**
+     * Persists and reloads progression config after a command-side edit.
+     */
     private void applyConfigReload(CommandSender sender, String changedTarget) {
         plugin.getProgressManager().saveAll();
         plugin.saveConfig();
@@ -393,6 +426,9 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage("§aUpdated " + changedTarget + " and reloaded progression settings.");
     }
 
+    /**
+     * Filters tab completion options by the current token prefix.
+     */
     private List<String> filterPrefix(List<String> options, String token) {
         if (token == null) return options;
         String lower = token.toLowerCase(Locale.ROOT);
@@ -401,12 +437,18 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Returns a list of online player names for tab completion.
+     */
     private List<String> getPlayerNames() {
         return Bukkit.getOnlinePlayers().stream()
                 .map(Player::getName)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Returns all configured section IDs for tab completion.
+     */
     private List<String> getSectionIds() {
         List<SectionDefinition> sections = plugin.getProgressManager().getSections();
         List<String> ids = new ArrayList<>();
@@ -416,6 +458,9 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         return ids;
     }
 
+    /**
+     * Returns every progression entry ID across all sections.
+     */
     private List<String> getEntryIds() {
         List<String> ids = new ArrayList<>();
         for (ProgressEntry e : plugin.getProgressManager().getAllEntries()) {
@@ -424,6 +469,9 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         return ids;
     }
 
+    /**
+     * Returns entry IDs for the specified section, or all IDs if none match.
+     */
     private List<String> getEntryIdsForSection(String sectionId) {
         List<String> ids = new ArrayList<>();
         for (ProgressEntry e : plugin.getProgressManager().getAllEntries()) {
@@ -434,6 +482,9 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         return ids.isEmpty() ? getEntryIds() : ids;
     }
 
+    /**
+     * Safely parses a double from user input, sending an error on failure.
+     */
     private Double parseDouble(String raw, CommandSender sender, String errorMessage) {
         try {
             return Double.parseDouble(raw);
@@ -443,6 +494,9 @@ public class SbpcCommand implements CommandExecutor, TabCompleter {
         }
     }
 
+    /**
+     * Safely parses an integer from user input, sending an error on failure.
+     */
     private Integer parseInteger(String raw, CommandSender sender, String errorMessage) {
         try {
             return Integer.parseInt(raw);

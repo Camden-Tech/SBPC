@@ -34,6 +34,19 @@ public class ProgressEntry {
 
     private final int baseSeconds;
 
+    /**
+     * Constructs a new progression entry describing one unlockable.
+     *
+     * @param id           unique identifier for the entry
+     * @param sectionId    section this entry belongs to
+     * @param displayName  player-facing name used in boss bars/messages
+     * @param kind         entry category (item, enchant, custom, mechanic)
+     * @param material     material tied to ITEM entries (null otherwise)
+     * @param enchantment  enchantment tied to ENCHANT entries (null otherwise)
+     * @param enchantLevel enchantment level for ENCHANT entries
+     * @param customKey    arbitrary key for CUSTOM_ITEM / MECHANIC entries
+     * @param baseSeconds  base time required before the entry unlocks
+     */
     public ProgressEntry(String id,
                          String sectionId,
                          String displayName,
@@ -54,18 +67,30 @@ public class ProgressEntry {
         this.baseSeconds = baseSeconds;
     }
 
+    /**
+     * Identifier used for persistence and API access.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Section identifier this entry belongs to.
+     */
     public String getSectionId() {
         return sectionId;
     }
 
+    /**
+     * Player-friendly display name of the entry.
+     */
     public String getDisplayName() {
         return displayName;
     }
 
+    /**
+     * Kind/category of this entry.
+     */
     public EntryKind getKind() {
         return kind;
     }
@@ -78,14 +103,23 @@ public class ProgressEntry {
         return kind;
     }
 
+    /**
+     * Material tied to ITEM unlocks, or null for other entry types.
+     */
     public Material getMaterial() {
         return material;
     }
 
+    /**
+     * Enchantment tied to ENCHANT unlocks, or null otherwise.
+     */
     public Enchantment getEnchantment() {
         return enchantment;
     }
 
+    /**
+     * Level associated with an ENCHANT entry.
+     */
     public int getEnchantLevel() {
         return enchantLevel;
     }
@@ -99,6 +133,9 @@ public class ProgressEntry {
         return customKey;
     }
 
+    /**
+     * Base time required to complete this entry before any bonuses are applied.
+     */
     public int getBaseSeconds() {
         return baseSeconds;
     }

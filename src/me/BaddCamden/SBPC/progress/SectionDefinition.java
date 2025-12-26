@@ -28,6 +28,18 @@ public class SectionDefinition {
      */
     private final String type;
 
+    /**
+     * Creates an immutable description of a progression section.
+     *
+     * @param id               unique identifier used in config and APIs
+     * @param displayName      player-facing section name
+     * @param entries          ordered list of entries within the section
+     * @param relatedMaterials materials that speed up progress in this section
+     * @param specialInfo      optional special criteria description
+     * @param colorCode        colour code prefix for display name formatting
+     * @param type             logical section type (NORMAL, SPECIAL, etc.)
+     * @param broadcastUnlock  whether to broadcast when the section is unlocked
+     */
     public SectionDefinition(String id,
                              String displayName,
                              List<ProgressEntry> entries,
@@ -56,30 +68,51 @@ public class SectionDefinition {
 
     }
 
+    /**
+     * Unique identifier for this section.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Player-facing display name (without colour codes applied).
+     */
     public String getDisplayName() {
         return displayName;
     }
 
+    /**
+     * Ordered list of entries contained in this section.
+     */
     public List<ProgressEntry> getEntries() {
         return entries;
     }
 
+    /**
+     * Set of materials that provide speed bonuses for this section.
+     */
     public Set<Material> getRelatedMaterials() {
         return relatedMaterials;
     }
 
+    /**
+     * Optional special criteria text displayed to players.
+     */
     public String getSpecialInfo() {
         return specialInfo;
     }
 
+    /**
+     * Colour code prefix configured for this section.
+     */
     public String getColorCode() {
         return colorCode;
     }
 
+    /**
+     * Whether unlocking this section should be broadcast to the server.
+     */
     public boolean shouldBroadcastUnlock() {
         return broadcastUnlock;
     }
