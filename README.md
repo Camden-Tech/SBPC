@@ -1,85 +1,91 @@
-# SBPC (Session Based Progression Cap)
+# SBPC (Session-Based Progression Cap)
 
-Session-Based Progression Cap (SBPC) is a Spigot plugin that sequences item, enchant, and mechanic unlocks over time-bound “sections.” It ships with a rich `config.yml` defining pacing, messages, and progression milestones, and expects a companion SessionLibrary for session gating.
+SBPC is a Spigot plugin that paces progression behind **time-bound sections**. Players unlock items, enchants, and mechanics as in-game time advances or when they hit specific milestones, giving you fine-grained control over how fast a world opens up. It is built to cooperate with [SessionLibrary] for session-aware gating but works without it.
 
-## Project layout
+## Why use SBPC?
+- **Sectioned unlocks:** Progression is split into ordered "sections" with timers. Related materials or milestones speed the timer up, while admin commands can jump or slow entire sections.
+- **Rich pacing controls:** Global speed multipliers, per-material bonuses, and kill- or inventory-based auto-completion make it easy to tune a season’s tempo.
+- **Player-facing guidance:** Bossbars, chat messages, and `/currenttimeskip` give clear feedback about what is locked, what is next, and how to accelerate progress.
+- **Session-aware access:** Optional SessionLibrary integration can block joins or pause progression when a session is closed, keeping events synchronized.
 
-- `pom.xml` – Maven build using Java 17, depends on `spigot-api` 1.21.10 and `SessionLibrary` 0.0.1-SNAPSHOT.
-- `src/plugin.yml` – Plugin metadata, commands, and permissions.
-- `src/config.yml` – Primary gameplay configuration (messages and progression sections).
+## Getting started
+1. **Drop the jar** (with your compiled main class) into `plugins/` and start the server. Java 17+ and Spigot/Paper 1.21 are expected.
+2. **Configure progression** in `plugins/SBPC/config.yml`. Sections are ordered; each entry defines a timed unlock for an item, enchant, custom mechanic, or custom item.
+3. **(Optional) Enable SessionLibrary** by setting `session.session-library-enabled: true`. When no session is active, joins are blocked with `messages.server-closed-join` and progression pauses.
+4. **Guide players**: Encourage `/currenttimeskip` to show the current section, its related materials, and any special completion rules.
 
-## Runtime entrypoint
+### Example gameplay flow
+- Early game, the **First Steps** section starts a 30s timer to unlock wooden axes. Chopping logs speeds it up using the related-material bonus.
+- When the server moves into **Wood Tools + Leather Armor**, collecting a **Pale Log** (even via commands) auto-completes the entire section. Otherwise, crafting the listed items or collecting leather speeds the timers.
+- Combat-focused sections such as **Meats** and **Murder** grant time skips on mob or player kills; unique kill tracking prevents farming the same victim repeatedly.
+- Long-haul sections like **Blaze Powder** can run for hours but accept stacking speed boosts from special items or admin multipliers to keep them manageable.
 
-`plugin.yml` points to `me.BaddCamden.SBPC.SBPCPlugin` as the main class, but no Java sources are included in this repository snapshot. To run the plugin you must supply that class (and any supporting code) on the classpath when packaging the jar.
+### Admin command examples
+- `/sbpc reloadConfig` → Reload `config.yml` and rebind listeners without restarting.
+- `/sbpc jump massacre` → Skip directly to the `massacre` section for testing.
+- `/sbpc speed 0.5` → Halve all timers globally; combine with related-material bonuses for rapid progression events.
+- `/sbpc config` → Inspect the active configuration and confirm section ordering during setup.
 
+### Configuration snippets
+Configure a section that autocompletes on inventory detection and gains speed from related materials:
 ```yaml
-main: me.BaddCamden.SBPC.SBPCPlugin
-softdepend:
-  - SessionLibrary
-api-version: 1.21
+progression:
+  related-bonus:
+    skip-seconds: 10
+    percent-speed-increase: 3.0
+  sections:
+    shulker_shell:
+      display-name: "Shulker Shells"
+      color: "§d"
+      related-materials: [SHULKER_SHELL]
+      special-info: "Possessing an Elytra auto completes this section."
+      entries:
+        shulker_shell:
+          type: ITEM
+          material: SHULKER_SHELL
+          seconds: 7200
 ```
 
-### Expected startup flow
-1. Plugin enables after its soft dependency (SessionLibrary) if present.
-2. Main class should read `config.yml`, register listeners/commands, and initialize progression state.
-3. If `session.session-library-enabled` is `true`, defer availability to SessionLibrary session state; otherwise always allow progression.
+## Plugin integration surface (for hook plugins)
+Expose or implement the following API so other plugins can react to or influence SBPC progression. These names reflect the expected runtime types even though the Java sources are not bundled in this snapshot.
 
-## Commands and permissions
+### Services and managers
+- `ProgressionService` — Primary API for reading and adjusting player progression.
+  - `SectionProgress getCurrentSection(Player player)` — Returns the active section identifier, display metadata, and per-entry timing for the player.
+  - `void advance(Player player, String entryKey, double seconds)` — Adds progress toward a specific entry (e.g., called when a mob is killed or an item is gathered).
+  - `void jumpToSection(String sectionId)` — Forces the server to advance directly to the given section; used by admin commands or tests.
+  - `void setSpeedMultiplier(double multiplier)` — Applies a global speed factor that stacks with related-material bonuses.
+  - `void reload()` — Reloads `config.yml`, rebuilds sections, and rebinds listeners.
+- `SessionGate` — (Optional) bridge to SessionLibrary; exposes current session state and events so hooks can align behavior when the server is closed.
 
-| Command | Permission | Purpose |
-| --- | --- | --- |
-| `/sbpc <reloadConfig|jump|speed|config>` | `sbpc.admin` (default: op) | Administrative controls: reload config, jump to sections, adjust speed, and inspect configuration. |
-| `/currenttimeskip` | _none declared_ | Shows a player’s current section, related materials, and special info. |
+### Data types
+- `SectionProgress`
+  - `String id` — Unique section key (e.g., `first_steps`).
+  - `String displayName` and `ChatColor color` — Presentable name and color for bossbars/messages.
+  - `List<EntryProgress> entries` — Ordered unlockables with remaining time.
+  - `List<Material> relatedMaterials` — Materials that trigger speed bonuses; useful for external listeners to register interest.
+  - `String specialInfo` — Human-readable rule for auto-completion or milestones.
+- `EntryProgress`
+  - `String key` — Internal identifier matching the config entry (e.g., `blaze_powder`).
+  - `String name` — Player-facing label shown in bossbars.
+  - `EntryType type` (`ITEM`, `CUSTOM_ITEM`, `ENCHANT`, `MECHANIC`) — The kind of unlock represented.
+  - `Material material` / `String customKey` / `Enchantment enchantKey` / `int level` — Type-specific identifiers hook plugins can recognize when listening to events.
+  - `double remainingSeconds` and `double totalSeconds` — Time bookkeeping for visualizations or alternative UIs.
 
-## Configuration reference (high level)
+### Events (suggested)
+If you expose Bukkit events, hook plugins can respond without direct service calls:
+- `SectionStartEvent(Player, SectionProgress)` — Fired when a player enters a new section.
+- `EntryUnlockEvent(Player, EntryProgress)` — Fired when an entry finishes; allows other plugins to grant items, play sounds, or log analytics.
+- `SectionCompleteEvent(Player, SectionProgress)` — Triggered when all entries in a section unlock.
+- `SessionStateChangeEvent(boolean active)` — Indicates SessionLibrary open/closed state; useful for pausing custom systems alongside SBPC.
 
-- `session.session-library-enabled`: Toggles integration with SessionLibrary for session gating.
-- `messages.*`: All player-facing strings; placeholders like `{section}`, `{item}`, and `{seconds}` must be replaced at runtime.
-- `progression.global-speed-multiplier`: Global pacing modifier applied to all sections.
-- `progression.related-bonus`: Base per-material bonus (`skip-seconds`, `percent-speed-increase`) applied when related materials are collected.
-- `progression.sections`: Ordered progression blocks. Each section defines:
-  - `display-name`, `color`, optional `broadcast-unlock`, `related-materials`, `special-info`.
-  - `entries`: Timed unlockables with `type` (`ITEM`, `CUSTOM_ITEM`, `ENCHANT`, `MECHANIC`), identifiers (`material`, `custom-key`, or `enchant-key` + `level`), and `seconds` duration.
+## Implementation notes
+- The packaged `plugin.yml` points to `me.BaddCamden.SBPC.SBPCPlugin` as the main class; include your sources when building the jar.
+- The bundled `config.yml` contains all sections and messages described above; customize it to fit your server’s pacing, or extend it with new `CUSTOM_ITEM` or `MECHANIC` keys for your own plugins to implement.
+- Build with Maven (`mvn clean package`). Ensure compiled classes and `plugin.yml` ship at the jar root.
 
-## Implementation hooks and quirks
+## Useful references
+- `src/plugin.yml` — Commands, permissions, and plugin metadata.
+- `src/config.yml` — Default messages and the full progression tree, including related materials and special completion rules.
 
-- **Custom items/mechanics**: Many entries use `CUSTOM_ITEM` or `MECHANIC` with `custom-key` (e.g., `pvp_unlock`, `tracking_compass`, `housing_infrastructure`). Your code must map these keys to actual behaviors, progression triggers, or items.
-- **Auto-complete conditions**: Several sections complete when the player possesses specific items or effects “even if not obtained naturally” (e.g., Pale Log, Obsidian, Dragon Egg). Implement listeners that scan inventories/effects rather than only crafting/pickup events.
-- **Kill-based progress**: Sections like `murder`, `massacre`, and `serial_killer` rely on player kill events, sometimes tracking unique victims or skipping fixed time per kill. Ensure you record unique player UUIDs to prevent duplicate credit.
-- **Enchant tiers**: Four large blocks of `ENCHANT` entries expect interception of enchanting, disenchanting, and potentially anvil actions to validate availability and to speed progress when allowed.
-- **Long timers with large boosts**: Some entries last up to 96 hours (`blaze_powder`, `shulker_shell`) but can be accelerated by 10,000% or auto-completed. Clamp progress calculations to avoid negative remaining time when stacking boosts.
-- **Bossbar and messaging**: `messages.bossbar-*` imply a bossbar showing active entry time remaining. Keep UI updates in sync with the internal scheduler.
-- **Session gating**: When SessionLibrary reports no active session, joins should be denied with `messages.server-closed-join` and progression timers paused or blocked.
-
-## Suggested API surface
-
-Expose a small API for other plugins or internal modules:
-
-- `ProgressionService#getCurrentSection(Player)` → returns section id and entry progress for the player.
-- `ProgressionService#advance(Player, key, amountSeconds)` → adds time progress to a specific entry (used by hooks for kills, crafting, pickups).
-- `ProgressionService#jumpToSection(String sectionId)` → admin and `/sbpc jump` support.
-- `ProgressionService#setSpeedMultiplier(double multiplier)` → integrates with `/sbpc speed` and global modifiers.
-- `ProgressionService#reload()` → reloads `config.yml` and rebinds hooks.
-
-## Edge cases to test
-
-- Using `/sbpc jump` while timers are mid-progress (ensure carry-over rules are defined).
-- Applying overlapping speed boosts (related materials + special items + admin speed) without producing negative durations.
-- Enchant table rolls when the player has not unlocked any rolled enchantment (`messages.enchant-cancelled`).
-- Inventory-based auto-complete detection when items are moved via hoppers or commands, not picked up.
-- Session disabled while a section is in progress—timers should pause and bossbars hide until the session resumes.
-
-## Building
-
-Because the build excludes `*.java` under `src`, you must either:
-
-1. Place Java sources outside `src` or adjust `pom.xml` resource excludes; **or**
-2. Move sources into `src` and remove the `**/*.java` exclude from the resources block.
-
-Compile with Maven:
-
-```bash
-mvn clean package
-```
-
-Ensure the produced jar contains your implementation classes and `plugin.yml` at the root, along with the bundled `config.yml` if you want defaults shipped.
+[SessionLibrary]: https://github.com/BaddCamden/SessionLibrary
