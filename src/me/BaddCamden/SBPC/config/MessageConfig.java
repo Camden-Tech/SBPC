@@ -10,6 +10,10 @@ public class MessageConfig {
 
     private static final Map<String, String> messages = new HashMap<>();
 
+    /**
+     * Loads all configurable messages from the plugin config into memory.
+     * Call this when the plugin starts or after reloading configuration.
+     */
     public static void load(FileConfiguration cfg) {
         messages.clear();
 
@@ -73,17 +77,26 @@ public class MessageConfig {
                 "&cOnly players may run this command.");
     }
 
+    /**
+     * Reads a message from the config with a default value and stores it under the given key.
+     */
     private static void put(FileConfiguration cfg, String key, String path, String def) {
         String value = cfg.getString(path, def);
         if (value == null) value = def;
         messages.put(key, colorize(value));
     }
 
+    /**
+     * Retrieves a previously loaded message by key, returning an empty string if missing.
+     */
     public static String get(String key) {
         String v = messages.get(key);
         return v == null ? "" : v;
     }
 
+    /**
+     * Retrieves and performs simple placeholder replacement on a message.
+     */
     public static String format(String key, Map<String, String> placeholders) {
         String base = get(key);
         if (base.isEmpty() || placeholders == null) return base;

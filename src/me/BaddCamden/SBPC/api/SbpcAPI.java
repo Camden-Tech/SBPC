@@ -18,12 +18,21 @@ public final class SbpcAPI {
 
     private static ProgressManager manager;
 
+    /**
+     * Utility class; prevent instantiation.
+     */
     private SbpcAPI() {}
 
+    /**
+     * Wires the API to the plugin's ProgressManager. Must be called during plugin startup.
+     */
     public static void init(ProgressManager mgr) {
         manager = mgr;
     }
 
+    /**
+     * Ensures the API has been initialised before accessing the manager.
+     */
     private static ProgressManager requireManager() {
         if (manager == null) {
             throw new IllegalStateException("SbpcAPI not initialized yet.");

@@ -39,6 +39,9 @@ import org.bukkit.scheduler.BukkitTask;
 import me.BaddCamden.SBPC.api.SbpcAPI;
 import me.BaddCamden.SBPC.progress.ProgressManager;
 
+/**
+ * Main plugin entry point for SBPC. Coordinates progression tracking, commands, and listeners.
+ */
 public class SBPCPlugin extends JavaPlugin implements Listener {
 
     public static final String BLOCK_PLACED_META = "sbpc_placed";
@@ -52,15 +55,24 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
     private boolean sessionLibraryIntegrationEnabled = false;
     private boolean sessionActive = false;
 
+    /**
+     * @return globally accessible plugin instance set during onEnable.
+     */
     public static SBPCPlugin getInstance() {
         return instance;
     }
 
+    /**
+     * @return the progression manager responsible for player unlock state.
+     */
     public ProgressManager getProgressManager() {
         return progressManager;
     }
 
     @Override
+    /**
+     * Bootstrap plugin state, commands, listeners, and ticking tasks.
+     */
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
@@ -91,6 +103,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
     }
 
     @Override
+    /**
+     * Persist state, unregister listeners, and clean up boss bars when the plugin stops.
+     */
     public void onDisable() {
         if (tickTask != null) tickTask.cancel();
         if (progressManager != null) {
@@ -107,6 +122,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         instance = null;
     }
 
+    /**
+     * Reads configuration and applies global speed/bonus settings as well as optional integrations.
+     */
     public void loadConfigValues() {
         FileConfiguration cfg = getConfig();
         MessageConfig.load(cfg);
@@ -123,6 +141,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         configureSessionLibraryIntegration();
     }
 
+    /**
+     * Enables or disables SessionLibrary integration depending on availability and config.
+     */
     private void configureSessionLibraryIntegration() {
         boolean integrationEnabledInConfig = getConfig().getBoolean("session.session-library-enabled", true);
         Plugin sessionLib = Bukkit.getPluginManager().getPlugin("SessionLibrary");
@@ -156,6 +177,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         }
     }
 
+    /**
+     * Detects whether SessionLibrary event classes are on the classpath.
+     */
     private boolean isSessionLibraryClassesPresent() {
         try {
             Class.forName("me.BaddCamden.SessionLibrary.events.SessionStartEvent");
@@ -167,6 +191,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         }
     }
 
+    /**
+     * Cleanly tears down SessionLibrary integration and optionally logs why.
+     */
     private void disableSessionLibraryIntegration(String reason, boolean warn) {
         if (sessionLibraryListener != null) {
             HandlerList.unregisterAll(sessionLibraryListener);
@@ -184,6 +211,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         }
     }
 
+    /**
+     * Per-second tick task that advances active players' progression timers.
+     */
     private void tickPlayers() {
         if (!sessionActive) return;
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -195,11 +225,17 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
     // Join blocking when “closed”
     // ------------------------------------------------------------------------
 
+    /**
+     * Pre-login hook to prepare for session-closed kicks on join.
+     */
     @EventHandler
     public void onAsyncLogin(AsyncPlayerPreLoginEvent event) {
         // Actual kick is handled on PlayerJoin (needs Player for op check)
     }
 
+    /**
+     * Handles join-time gating and sets up boss bars/intro messaging.
+     */
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
@@ -221,6 +257,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
     // Activity tracking & natural vs placed blocks
     // ------------------------------------------------------------------------
 
+    /**
+     * Marks players as active when they move to keep their timers ticking.
+     */
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         if (event.getTo() != null && !event.getTo().toVector().equals(event.getFrom().toVector())) {
@@ -228,6 +267,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         }
     }
 
+    /**
+     * Blocks breaking with locked items and routes natural/placed block handling.
+     */
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
@@ -251,6 +293,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
     }
 
 
+    /**
+     * Marks placed blocks so later breaks do not count as natural resources.
+     */
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
@@ -266,6 +311,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         // Mark block as player-placed so it doesn't count as “natural”
         event.getBlockPlaced().setMetadata(BLOCK_PLACED_META, new FixedMetadataValue(this, true));
     }
+    /**
+     * Prevents picking up items the player has not unlocked yet.
+     */
     @EventHandler
     public void onItemPickup(EntityPickupItemEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
@@ -280,6 +328,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         }
     }
 
+    /**
+     * Prevents using buckets the player has not unlocked when emptying.
+     */
     @EventHandler
     public void onBucketEmpty(PlayerBucketEmptyEvent event) {
         Player player = event.getPlayer();
@@ -290,6 +341,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         }
     }
 
+    /**
+     * Prevents filling buckets the player has not unlocked.
+     */
     @EventHandler
     public void onBucketFill(PlayerBucketFillEvent event) {
         Player player = event.getPlayer();
@@ -300,6 +354,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         }
     }
 
+    /**
+     * Cancels interactions with items that are not yet unlocked (blocks, shields, etc.).
+     */
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -326,36 +383,57 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
     // Item & enchant blocking hooks
     // ------------------------------------------------------------------------
 
+    /**
+     * Strips craft results for items the player has not unlocked.
+     */
     @EventHandler
     public void onPrepareCraft(PrepareItemCraftEvent event) {
         progressManager.handlePrepareCraft(event);
     }
 
+    /**
+     * Sanitises player equipment after inventory interactions.
+     */
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         progressManager.handleInventoryClick(event);
     }
 
+    /**
+     * Filters enchant rolls based on unlocked enchantments.
+     */
     @EventHandler
     public void onEnchant(EnchantItemEvent event) {
         progressManager.handleEnchant(event);
     }
 
+    /**
+     * Removes disallowed enchantments from anvil outputs.
+     */
     @EventHandler
     public void onPrepareAnvil(PrepareAnvilEvent event) {
         progressManager.handlePrepareAnvil(event);
     }
 
+    /**
+     * Ensures players cannot deal damage with locked items or enchants.
+     */
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         progressManager.handleEntityDamage(event);
     }
 
+    /**
+     * Applies related resource bonuses from mob drops.
+     */
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
         progressManager.handleEntityDeath(event);
     }
 
+    /**
+     * Cleans up boss bars when players quit.
+     */
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         progressManager.removeBossBar(event.getPlayer().getUniqueId());
@@ -365,6 +443,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
     // SessionManager integration callbacks
     // ------------------------------------------------------------------------
 
+    /**
+     * Invoked when SessionLibrary reports a session start.
+     */
     void handleSessionStart() {
         sessionActive = true;
         getLogger().info("SessionManager session started – SBPC timers ticking while players are active.");
@@ -374,6 +455,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         }
     }
 
+    /**
+     * Invoked when SessionLibrary reports a session end and kicks non-opped players.
+     */
     void handleSessionEnd() {
         sessionActive = false;
         getLogger().info("SessionManager session ended – kicking all non-opped players.");
@@ -385,6 +469,9 @@ public class SBPCPlugin extends JavaPlugin implements Listener {
         }
     }
 
+    /**
+     * Placeholder for potential periodic work while a session is active.
+     */
     void handleSessionTick() {
         // Optional hook point
     }
